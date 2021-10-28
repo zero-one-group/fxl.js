@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: use node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+      - name: install dependencies
+        run: yarn install
+      - name: run tests
+        run: yarn nx run-many --all --target=test
+      - run: run linters
+        run: yarn nx run-many --all --target=lint
