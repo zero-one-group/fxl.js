@@ -23,5 +23,3 @@ jobs:
         run: yarn install
       - name: run tests
         run: yarn nx run-many --all --target=test
-      - name: run linters
-        run: yarn nx run-many --all --target=lint
