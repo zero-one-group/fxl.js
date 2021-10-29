@@ -9,18 +9,25 @@ temp.track();
 
 describe('basic reading and writing xlsx', () => {
   it('readXlsx should return valid cells', async () => {
-		const cells = await fxl.readXlsx(XLSX_PATH);
+    const cells = await fxl.readXlsx(XLSX_PATH);
     expect(cells.length).toBe(23);
     expect(cells.map(fxl.validateCell).filter(t.isError)).toEqual([]);
   });
 
   it('writeXlsx should take in valid cells', async () => {
-    const cells = [fxl.toCell('abc')];
+    const cell = fxl.toCell('abc');
     const tempFile = temp.openSync('excel-temp');
-    await fxl.writeXlsx(cells, tempFile.path);
+    await fxl.writeXlsx([cell], tempFile.path);
     const loadedCells = await fxl.readXlsx(tempFile.path);
-    expect(loadedCells.length).toBe(cells.length);
-    expect(loadedCells.map((x) => x.value)).toEqual(cells.map((x) => x.value));
+    expect(loadedCells.length).toBe(1);
+    expect(loadedCells.map((x) => x.value)).toEqual([cell.value]);
+  });
+
+  it('writeXlsx should fail gracefully', async () => {
+    const cell = { ...fxl.toCell('abc'), coord: { row: -1, col: 0 } };
+    const tempFile = temp.openSync('excel-temp');
+    const error = await fxl.writeXlsx([cell], tempFile.path);
+    expect(t.isError(error)).toBe(true);
   });
 });
 

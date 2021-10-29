@@ -23,7 +23,9 @@ export function validateCoord(coord: t.Coord): t.ValidCoord | t.Error {
   ) {
     return coord as t.ValidCoord;
   } else {
-    return { error: 'invalid coordinate range' };
+    return {
+      error: `invalid coordinate range in ${JSON.stringify(coord, null, 2)}`,
+    };
   }
 }
 
@@ -31,7 +33,7 @@ export function validateCell(cell: t.Cell): t.ValidCell | t.Error {
   const messages = [];
   const coordValidation = validateCoord(cell.coord);
   if (t.isError(coordValidation)) {
-    messages.push(coordValidation);
+    messages.push(coordValidation.error);
   }
   if (messages.length == 0) {
     return cell as t.ValidCell;
@@ -45,7 +47,7 @@ function toFxlCell(
   rowIndex: number,
   colIndex: number,
   sheetName: string
-): t.Cell {
+): t.ValidCell {
   return {
     value: cell.value,
     coord: {
@@ -54,10 +56,10 @@ function toFxlCell(
       sheet: sheetName,
     },
     style: {},
-  };
+  } as t.ValidCell;
 }
 
-export async function readXlsx(fileName: string): Promise<t.Cell[]> {
+export async function readXlsx(fileName: string): Promise<t.ValidCell[]> {
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(fileName);
   const cells = [];
@@ -71,9 +73,8 @@ export async function readXlsx(fileName: string): Promise<t.Cell[]> {
   return cells;
 }
 
-// TODO: change to t.ValidCell
-export async function writeXlsx(
-  cells: t.Cell[],
+async function validatedWriteXlsx(
+  cells: t.ValidCell[],
   fileName: string
 ): Promise<void> {
   const workbook = new ExcelJS.Workbook();
@@ -85,4 +86,33 @@ export async function writeXlsx(
     excelCell.value = cell.value;
   });
   await workbook.xlsx.writeFile(fileName);
+}
+
+function concatErrors(errors: t.Error[]): t.Error {
+  return { error: errors.map((x) => x.error).join('\n') };
+}
+
+function splitErrors<T>(results: (T | t.Error)[]): [T[], t.Error[]] {
+  const values: T[] = [];
+  const errors: t.Error[] = [];
+  results.forEach((result) => {
+    if (t.isError(result)) {
+      errors.push(result);
+    } else {
+      values.push(result);
+    }
+  });
+  return [values, errors];
+}
+
+export async function writeXlsx(
+  cells: t.Cell[],
+  fileName: string
+): Promise<void | t.Error> {
+  const [validCells, errors] = splitErrors(cells.map(validateCell));
+  if (errors.length == 0) {
+    await validatedWriteXlsx(validCells, fileName);
+  } else {
+    return concatErrors(errors);
+  }
 }
