@@ -1,3 +1,5 @@
+import * as ExcelJS from 'exceljs';
+
 ///////////////////////////////////////////////////////////////////////////////
 // Generics
 ///////////////////////////////////////////////////////////////////////////////
@@ -10,7 +12,7 @@ export interface Error {
   error: string;
 }
 
-export type Value = string | number | boolean;
+export type Value = ExcelJS.CellValue;
 
 export interface Coord {
   row: number;

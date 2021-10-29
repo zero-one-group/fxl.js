@@ -1,4 +1,20 @@
 import * as fxl from './core';
+import * as t from './types';
+
+const XLSX_PATH = 'packages/core/src/data/dummy-spreadsheet.xlsx';
+
+describe('basic reading and writing xlsx', () => {
+  it('readXlsx should return valid cells', async () => {
+    const cells = await fxl.readXlsx(XLSX_PATH);
+    expect(cells.length).toBe(23);
+    expect(
+      cells
+        .map(fxl.validateCell)
+        .map(t.isError)
+        .every((x) => !x)
+    ).toBe(true);
+  });
+});
 
 describe('validators', () => {
   const validCoord = { row: 0, col: 0 };

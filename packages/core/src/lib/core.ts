@@ -1,3 +1,5 @@
+import * as ExcelJS from 'exceljs';
+
 import * as t from './types';
 
 const MAX_ROWS = Math.round(1e5);
@@ -35,4 +37,35 @@ export function validateCell(cell: t.Cell): t.ValidCell | t.Error {
   } else {
     return { error: messages.join('\n') };
   }
+}
+
+function toFxlCell(
+  cell: ExcelJS.Cell,
+  rowIndex: number,
+  colIndex: number,
+  sheetName: string
+): t.Cell {
+  return {
+    value: cell.value,
+    coord: {
+      row: rowIndex - 1,
+      col: colIndex - 1,
+      sheet: sheetName,
+    },
+    style: {},
+  };
+}
+
+export async function readXlsx(fileName: string): Promise<t.Cell[]> {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(fileName);
+  const cells = [];
+  workbook.eachSheet((worksheet) => {
+    worksheet.eachRow((row, rowIndex) => {
+      row.eachCell((cell, colIndex) => {
+        cells.push(toFxlCell(cell, rowIndex, colIndex, worksheet.name));
+      });
+    });
+  });
+  return cells;
 }
