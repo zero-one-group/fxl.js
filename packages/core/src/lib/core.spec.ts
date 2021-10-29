@@ -1,18 +1,26 @@
+import * as temp from 'temp';
+
 import * as fxl from './core';
 import * as t from './types';
 
 const XLSX_PATH = 'packages/core/src/data/dummy-spreadsheet.xlsx';
 
+temp.track();
+
 describe('basic reading and writing xlsx', () => {
   it('readXlsx should return valid cells', async () => {
-    const cells = await fxl.readXlsx(XLSX_PATH);
+		const cells = await fxl.readXlsx(XLSX_PATH);
     expect(cells.length).toBe(23);
-    expect(
-      cells
-        .map(fxl.validateCell)
-        .map(t.isError)
-        .every((x) => !x)
-    ).toBe(true);
+    expect(cells.map(fxl.validateCell).filter(t.isError)).toEqual([]);
+  });
+
+  it('writeXlsx should take in valid cells', async () => {
+    const cells = [fxl.toCell('abc')];
+    const tempFile = temp.openSync('excel-temp');
+    await fxl.writeXlsx(cells, tempFile.path);
+    const loadedCells = await fxl.readXlsx(tempFile.path);
+    expect(loadedCells.length).toBe(cells.length);
+    expect(loadedCells.map((x) => x.value)).toEqual(cells.map((x) => x.value));
   });
 });
 

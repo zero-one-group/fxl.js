@@ -2,6 +2,7 @@ import * as ExcelJS from 'exceljs';
 
 import * as t from './types';
 
+const DEFAULT_SHEET_NAME = 'Sheet 1';
 const MAX_ROWS = Math.round(1e5);
 const MAX_COLS = Math.round(1e4);
 
@@ -68,4 +69,20 @@ export async function readXlsx(fileName: string): Promise<t.Cell[]> {
     });
   });
   return cells;
+}
+
+// TODO: change to t.ValidCell
+export async function writeXlsx(
+  cells: t.Cell[],
+  fileName: string
+): Promise<void> {
+  const workbook = new ExcelJS.Workbook();
+  cells.forEach((cell) => {
+    const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
+    const worksheet =
+      workbook.getWorksheet(sheetName) || workbook.addWorksheet(sheetName);
+    const excelCell = worksheet.getCell(cell.coord.row + 1, cell.coord.col + 1);
+    excelCell.value = cell.value;
+  });
+  await workbook.xlsx.writeFile(fileName);
 }
