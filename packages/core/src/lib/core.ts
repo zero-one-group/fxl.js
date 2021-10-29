@@ -1,4 +1,5 @@
 import * as ExcelJS from 'exceljs';
+import { Ok, Err, Result, Option, Some, None } from 'ts-results';
 
 import * as t from './types';
 
@@ -14,35 +15,34 @@ export function toCell(value: t.Value): t.Cell {
   };
 }
 
-export function validateCoord(coord: t.Coord): t.ValidCoord | t.Error {
+export function validateCoord(coord: t.Coord): Result<t.ValidCoord, t.Error> {
   if (
     coord.row >= 0 &&
     coord.row <= MAX_ROWS &&
     coord.col >= 0 &&
     coord.col <= MAX_COLS
   ) {
-    return coord as t.ValidCoord;
+    return Ok(coord as t.ValidCoord);
   } else {
-    return {
-      error: `invalid coordinate range in ${JSON.stringify(coord, null, 2)}`,
-    };
+    const prettyCoord = JSON.stringify(coord, null, 2);
+    return Err({ error: `invalid coordinate range in ${prettyCoord}` });
   }
 }
 
-export function validateCell(cell: t.Cell): t.ValidCell | t.Error {
-  const messages = [];
-  const coordValidation = validateCoord(cell.coord);
-  if (t.isError(coordValidation)) {
-    messages.push(coordValidation.error);
+export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
+  const errors = [];
+  const validated = validateCoord(cell.coord);
+  if (validated.err) {
+    errors.push(validated.val);
   }
-  if (messages.length == 0) {
-    return cell as t.ValidCell;
+  if (errors.length == 0) {
+    return Ok(cell as t.ValidCell);
   } else {
-    return { error: messages.join('\n') };
+    return Err(concatErrors(errors));
   }
 }
 
-function toFxlCell(
+function toFxl(
   cell: ExcelJS.Cell,
   rowIndex: number,
   colIndex: number,
@@ -59,18 +59,24 @@ function toFxlCell(
   } as t.ValidCell;
 }
 
-export async function readXlsx(fileName: string): Promise<t.ValidCell[]> {
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.readFile(fileName);
-  const cells = [];
-  workbook.eachSheet((worksheet) => {
-    worksheet.eachRow((row, rowIndex) => {
-      row.eachCell((cell, colIndex) => {
-        cells.push(toFxlCell(cell, rowIndex, colIndex, worksheet.name));
+export async function readXlsx(
+  fileName: string
+): Promise<Result<t.ValidCell[], t.Error>> {
+  try {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(fileName);
+    const cells = [];
+    workbook.eachSheet((worksheet) => {
+      worksheet.eachRow((row, rowIndex) => {
+        row.eachCell((cell, colIndex) => {
+          cells.push(toFxl(cell, rowIndex, colIndex, worksheet.name));
+        });
       });
     });
-  });
-  return cells;
+    return Ok(cells);
+  } catch (exception) {
+    return Err({ error: exception.message });
+  }
 }
 
 async function validatedWriteXlsx(
@@ -92,14 +98,15 @@ function concatErrors(errors: t.Error[]): t.Error {
   return { error: errors.map((x) => x.error).join('\n') };
 }
 
-function splitErrors<T>(results: (T | t.Error)[]): [T[], t.Error[]] {
+function splitErrors<T, U>(results: Result<T, U>[]): [T[], U[]] {
   const values: T[] = [];
-  const errors: t.Error[] = [];
+  const errors: U[] = [];
   results.forEach((result) => {
-    if (t.isError(result)) {
-      errors.push(result);
-    } else {
-      values.push(result);
+    if (result.ok) {
+      values.push(result.val);
+    }
+    if (result.err) {
+      errors.push(result.val);
     }
   });
   return [values, errors];
@@ -108,11 +115,12 @@ function splitErrors<T>(results: (T | t.Error)[]): [T[], t.Error[]] {
 export async function writeXlsx(
   cells: t.Cell[],
   fileName: string
-): Promise<void | t.Error> {
+): Promise<Option<t.Error>> {
   const [validCells, errors] = splitErrors(cells.map(validateCell));
   if (errors.length == 0) {
     await validatedWriteXlsx(validCells, fileName);
+    return None;
   } else {
-    return concatErrors(errors);
+    return Some(concatErrors(errors));
   }
 }
