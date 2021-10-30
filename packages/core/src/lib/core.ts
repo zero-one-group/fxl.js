@@ -200,7 +200,7 @@ function readExcelCell(
       col: colIndex - 1,
       sheet: sheetName,
     },
-    style: {},
+    style: cell.style,
   } as t.ValidCell;
 }
 
@@ -255,6 +255,7 @@ function toExcelWorkbook(cells: t.Cell[]): Result<ExcelJS.Workbook, t.Error> {
         cell.coord.col + 1
       );
       excelCell.value = cell.value;
+      excelCell.style = cell.style || {};
     });
     return Ok(workbook);
   } else {

@@ -24,6 +24,31 @@ function extractOk<T, U>(result: Result<T, U>): T {
   }
 }
 
+describe('cell style capture', () => {
+  it('readXlsx shold capture style properties', async () => {
+    const result = await fxl.readXlsx(XLSX_PATH);
+    const cells = extractOk(result);
+    expect(cells.filter((x) => x?.style?.font?.bold).length).toBe(1);
+  });
+
+  it('read-then-right should preserve style', async () => {
+    const font = { name: 'Roboto', size: 13 };
+    const cell = { ...fxl.toCell('abc'), style: { font: font } };
+    const writeResult = await fxl.writeBinary([cell]);
+    const readResult = await fxl.readBinary(extractOk(writeResult));
+    const loaded = extractOk(readResult);
+    expect(loaded.map((x) => x?.style?.font)).toEqual([font]);
+  });
+
+  it('read-then-right without style should work', async () => {
+    const cell = { value: 'abc', coord: { row: 1, col: 1 } };
+    const writeResult = await fxl.writeBinary([cell]);
+    const readResult = await fxl.readBinary(extractOk(writeResult));
+    const loaded = extractOk(readResult);
+    expect(loaded.map((x) => x?.style)).toEqual([{}]);
+  });
+});
+
 describe('basic coordinate helper functions', () => {
   const table = fxl.tableToCells([
     ['a', 'b'],
