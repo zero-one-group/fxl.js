@@ -16,7 +16,7 @@ export interface Coord {
 
 export type ValidCoord = Opaque<'ValidCoord', Coord>;
 
-export type Style = Record<string, unknown>;
+export type Style = Partial<ExcelJS.Style>;
 
 export interface Cell {
   value: Value;
