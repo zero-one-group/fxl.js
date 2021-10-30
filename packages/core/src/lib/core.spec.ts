@@ -1,3 +1,4 @@
+import * as ExcelJS from 'exceljs';
 import * as temp from 'temp';
 import { Result, Option } from 'ts-results';
 
@@ -52,6 +53,25 @@ describe('basic reading and writing xlsx', () => {
     const result = await fxl.writeXlsx([cell], tempFile.path);
     const error = extractSome(result);
     expect(error).toHaveProperty('error');
+  });
+
+  it('can write and read from binary', async () => {
+    const cell = fxl.toCell('abc');
+    const writeResult = await fxl.writeBinary([cell]);
+    const xlsxBuffer = extractOk(writeResult);
+    const readResult = await fxl.readBinary(xlsxBuffer);
+    const loadedCells = extractOk(readResult);
+    expect(loadedCells.map((x) => x.value)).toEqual([cell.value]);
+  });
+
+  it('binary functions should fail gracefully', async () => {
+    const cell = { ...fxl.toCell('abc'), coord: { row: -1, col: 0 } };
+    const writeResult = await fxl.writeBinary([cell]);
+    expect(writeResult.err).toBe(true);
+
+    const randomBuffer = new Uint16Array([1, 2, 3]) as ExcelJS.Buffer;
+    const readResult = await fxl.readBinary(randomBuffer);
+    expect(readResult.err).toBe(true);
   });
 });
 
