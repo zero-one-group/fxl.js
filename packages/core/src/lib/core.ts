@@ -118,6 +118,22 @@ export function concatBelow(...cellGroups: t.Cell[][]): t.Cell[] {
   return cellGroups.reduce(concatBelowTwoGroups);
 }
 
+export function padBelow(shift: number, cells: t.Cell[]): t.Cell[] {
+  if (shift == 0) {
+    return cells;
+  } else if (shift < 0) {
+    const padCell = shiftDown(-shift - 1, toCell(undefined));
+    return concatBelow([padCell], cells);
+  } else {
+    const padCell = shiftDown(shift - 1, toCell(undefined));
+    return concatBelow(cells, [padCell]);
+  }
+}
+
+export function padAbove(shift: number, cells: t.Cell[]): t.Cell[] {
+  return padBelow(-shift, cells);
+}
+
 function concatRightTwoGroups(left: t.Cell[], right: t.Cell[]): t.Cell[] {
   const shift = maxCol(left) + 1;
   const shiftedRight = right.map((cell) => shiftRight(shift, cell));
@@ -126,6 +142,22 @@ function concatRightTwoGroups(left: t.Cell[], right: t.Cell[]): t.Cell[] {
 
 export function concatRight(...cellGroups: t.Cell[][]): t.Cell[] {
   return cellGroups.reduce(concatRightTwoGroups);
+}
+
+export function padRight(shift: number, cells: t.Cell[]): t.Cell[] {
+  if (shift == 0) {
+    return cells;
+  } else if (shift < 0) {
+    const padCell = shiftRight(-shift - 1, toCell(undefined));
+    return concatRight([padCell], cells);
+  } else {
+    const padCell = shiftRight(shift - 1, toCell(undefined));
+    return concatRight(cells, [padCell]);
+  }
+}
+
+export function padLeft(shift: number, cells: t.Cell[]): t.Cell[] {
+  return padRight(-shift, cells);
 }
 
 export function validateCoord(coord: t.Coord): Result<t.ValidCoord, t.Error> {

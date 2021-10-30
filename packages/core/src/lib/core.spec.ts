@@ -71,6 +71,53 @@ describe('basic coordinate helper functions', () => {
     expect(fxl.maxRow(shiftedLeft)).toBe(1);
     expect(fxl.maxCol(shiftedLeft)).toBe(-4);
   });
+
+  it('pad functions should work properly ', () => {
+    const paddedBelow = fxl.padBelow(2, row);
+    expect(fxl.cellsToTable(paddedBelow)).toEqual([
+      [1, undefined, 3],
+      [undefined, undefined, undefined],
+      [undefined, undefined, undefined],
+    ]);
+    const paddedBelowZero = fxl.padBelow(0, row);
+    expect(fxl.cellsToTable(paddedBelowZero)).toEqual([[1, undefined, 3]]);
+    const paddedBelowNeg = fxl.padBelow(-1, column);
+    expect(fxl.cellsToTable(paddedBelowNeg)).toEqual([
+      [undefined],
+      [undefined],
+      [true],
+      [false],
+    ]);
+    const paddedAbove = fxl.padAbove(2, column);
+    expect(fxl.cellsToTable(paddedAbove)).toEqual([
+      [undefined],
+      [undefined],
+      [undefined],
+      [true],
+      [false],
+    ]);
+
+    const paddedRight = fxl.padRight(2, table);
+    expect(fxl.cellsToTable(paddedRight)).toEqual([
+      ['a', 'b', undefined, undefined],
+      ['x', 'y', undefined, undefined],
+    ]);
+    const paddedRightZero = fxl.padRight(0, table);
+    expect(fxl.cellsToTable(paddedRightZero)).toEqual([
+      ['a', 'b'],
+      ['x', 'y'],
+    ]);
+    const paddedRightNeg = fxl.padRight(-3, table);
+    expect(fxl.cellsToTable(paddedRightNeg)).toEqual([
+      [undefined, undefined, undefined, 'a', 'b'],
+      [undefined, undefined, undefined, 'x', 'y'],
+    ]);
+    const paddedLeft = fxl.padLeft(2, table);
+    expect(fxl.cellsToTable(paddedLeft)).toEqual([
+      [undefined, undefined, 'a', 'b'],
+      [undefined, undefined, 'x', 'y'],
+    ]);
+  });
 });
 
 describe('basic cell creation helper functions', () => {
