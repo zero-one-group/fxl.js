@@ -305,3 +305,45 @@ export async function writeBinary(
     return Err(workbook.val);
   }
 }
+
+export function pipe<T>(init: T, ...fns: t.Monoid<T>[]): T {
+  return fns.reduce((acc: T, fn: t.Monoid<T>) => fn(acc), init);
+}
+
+function getFont(cell: t.Cell): t.Font {
+  return cell.style?.font || {};
+}
+
+function assocFont(cell: t.Cell, font: t.Font): t.Cell {
+  const style = { ...cell.style, font: font };
+  return { ...cell, style: style };
+}
+
+export function bold(cell: t.Cell): t.Cell {
+  const font = getFont(cell);
+  return assocFont(cell, { ...font, bold: true });
+}
+
+export function italic(cell: t.Cell): t.Cell {
+  const font = getFont(cell);
+  return assocFont(cell, { ...font, italic: true });
+}
+
+export function underline(cell: t.Cell): t.Cell {
+  const font = getFont(cell);
+  return assocFont(cell, { ...font, underline: true });
+}
+
+export function setFontName(fontName: string): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const font = getFont(cell);
+    return assocFont(cell, { ...font, name: fontName });
+  };
+}
+
+export function setFontSize(fontSize: number): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const font = getFont(cell);
+    return assocFont(cell, { ...font, size: fontSize });
+  };
+}
