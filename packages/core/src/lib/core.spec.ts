@@ -24,6 +24,54 @@ function extractOk<T, U>(result: Result<T, U>): T {
   }
 }
 
+describe('basic coordinate helper functions', () => {
+  const values = ['a', 'b', 123, 789];
+  const records = [
+    { a: 1, b: 2 },
+    { a: 3, b: 4 },
+  ];
+  const table = [
+    ['x', 'y'],
+    [true, false],
+  ];
+
+  it('rowToCells should work properly', () => {
+    const cells = fxl.rowToCells(values);
+    expect(cells.map(fxl.validateCell).filter((x) => x.err)).toEqual([]);
+    expect(cells.map((x) => x.value)).toEqual(values);
+    const rangeArray = [...Array(values.length).keys()];
+    expect(cells.map((x) => x.coord.col)).toEqual(rangeArray);
+    expect(cells.map((x) => x.coord.row)).toEqual(Array(values.length).fill(0));
+  });
+
+  it('colToCells should work properly', () => {
+    const cells = fxl.colToCells(values);
+    expect(cells.map(fxl.validateCell).filter((x) => x.err)).toEqual([]);
+    expect(cells.map((x) => x.value)).toEqual(values);
+    const rangeArray = [...Array(values.length).keys()];
+    expect(cells.map((x) => x.coord.row)).toEqual(rangeArray);
+    expect(cells.map((x) => x.coord.col)).toEqual(Array(values.length).fill(0));
+  });
+
+  it('recordToCells should work properly', () => {
+    const cells = fxl.recordsToCells(['a', 'b'], records);
+    expect(cells.map(fxl.validateCell).filter((x) => x.err)).toEqual([]);
+    const firstRow = cells.filter((x) => x.coord.row == 0).map((x) => x.value);
+    expect(firstRow).toEqual([1, 2]);
+    const secondCol = cells.filter((x) => x.coord.col == 1).map((x) => x.value);
+    expect(secondCol).toEqual([2, 4]);
+  });
+
+  it('tableToCells should work properly', () => {
+    const cells = fxl.tableToCells(table);
+    expect(cells.map(fxl.validateCell).filter((x) => x.err)).toEqual([]);
+    const firstRow = cells.filter((x) => x.coord.row == 0).map((x) => x.value);
+    expect(firstRow).toEqual(['x', 'y']);
+    const secondCol = cells.filter((x) => x.coord.col == 1).map((x) => x.value);
+    expect(secondCol).toEqual(['y', false]);
+  });
+});
+
 describe('basic reading and writing xlsx', () => {
   it('readXlsx should return valid cells', async () => {
     const result = await fxl.readXlsx(XLSX_PATH);
@@ -75,7 +123,7 @@ describe('basic reading and writing xlsx', () => {
   });
 });
 
-describe('validation', () => {
+describe('validation functions', () => {
   const validCoord = { row: 0, col: 0 };
   const validCell = { value: 'abc', coord: validCoord };
   const invalidCoord = { row: -1, col: 0 };
@@ -94,7 +142,7 @@ describe('validation', () => {
   });
 });
 
-describe('core', () => {
+describe('utility functions', () => {
   it('toCell should have sensible defaults', () => {
     const cellValue = 'abc-xyz';
     const cell = fxl.toCell(cellValue);

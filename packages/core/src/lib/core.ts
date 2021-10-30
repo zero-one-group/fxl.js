@@ -15,6 +15,45 @@ export function toCell(value: t.Value): t.Cell {
   };
 }
 
+export function rowToCells(values: t.Value[]): t.Cell[] {
+  return values.map((value, index) => ({
+    value: value,
+    coord: { row: 0, col: index },
+    style: {},
+  }));
+}
+
+export function colToCells(values: t.Value[]): t.Cell[] {
+  return values.map((value, index) => ({
+    value: value,
+    coord: { row: index, col: 0 },
+    style: {},
+  }));
+}
+
+export function recordsToCells(
+  keys: string[],
+  records: Record<string, t.Value>[]
+): t.Cell[] {
+  return keys.flatMap((key, colIndex) =>
+    records.map((record, rowIndex) => ({
+      value: record[key],
+      coord: { row: rowIndex, col: colIndex },
+      style: {},
+    }))
+  );
+}
+
+export function tableToCells(table: t.Value[][]): t.Cell[] {
+  return table.flatMap((row, rowIndex) =>
+    row.map((value, colIndex) => ({
+      value: value,
+      coord: { row: rowIndex, col: colIndex },
+      style: {},
+    }))
+  );
+}
+
 export function validateCoord(coord: t.Coord): Result<t.ValidCoord, t.Error> {
   if (
     coord.row >= 0 &&
