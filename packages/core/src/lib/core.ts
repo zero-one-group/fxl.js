@@ -42,7 +42,7 @@ export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
   }
 }
 
-function toFxl(
+function readExcelCell(
   cell: ExcelJS.Cell,
   rowIndex: number,
   colIndex: number,
@@ -59,39 +59,62 @@ function toFxl(
   } as t.ValidCell;
 }
 
+function readExcelWorkbook(workbook: ExcelJS.Workbook): t.ValidCell[] {
+  const cells: t.ValidCell[] = [];
+  workbook.eachSheet((worksheet) => {
+    worksheet.eachRow((row, rowIndex) => {
+      row.eachCell((cell, colIndex) => {
+        cells.push(readExcelCell(cell, rowIndex, colIndex, worksheet.name));
+      });
+    });
+  });
+  return cells;
+}
+
 export async function readXlsx(
   fileName: string
 ): Promise<Result<t.ValidCell[], t.Error>> {
   try {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile(fileName);
-    const cells = [];
-    workbook.eachSheet((worksheet) => {
-      worksheet.eachRow((row, rowIndex) => {
-        row.eachCell((cell, colIndex) => {
-          cells.push(toFxl(cell, rowIndex, colIndex, worksheet.name));
-        });
-      });
-    });
+    const cells = readExcelWorkbook(workbook);
     return Ok(cells);
   } catch (exception) {
     return Err({ error: exception.message });
   }
 }
 
-async function validatedWriteXlsx(
-  cells: t.ValidCell[],
-  fileName: string
-): Promise<void> {
-  const workbook = new ExcelJS.Workbook();
-  cells.forEach((cell) => {
-    const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
-    const worksheet =
-      workbook.getWorksheet(sheetName) || workbook.addWorksheet(sheetName);
-    const excelCell = worksheet.getCell(cell.coord.row + 1, cell.coord.col + 1);
-    excelCell.value = cell.value;
-  });
-  await workbook.xlsx.writeFile(fileName);
+export async function readBinary(
+  binary: ExcelJS.Buffer
+): Promise<Result<t.ValidCell[], t.Error>> {
+  try {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(binary);
+    const cells = readExcelWorkbook(workbook);
+    return Ok(cells);
+  } catch (exception) {
+    return Err({ error: exception.message });
+  }
+}
+
+function toExcelWorkbook(cells: t.Cell[]): Result<ExcelJS.Workbook, t.Error> {
+  const [validCells, errors] = splitErrors(cells.map(validateCell));
+  if (errors.length == 0) {
+    const workbook = new ExcelJS.Workbook();
+    validCells.forEach((cell) => {
+      const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
+      const worksheet =
+        workbook.getWorksheet(sheetName) || workbook.addWorksheet(sheetName);
+      const excelCell = worksheet.getCell(
+        cell.coord.row + 1,
+        cell.coord.col + 1
+      );
+      excelCell.value = cell.value;
+    });
+    return Ok(workbook);
+  } else {
+    return Err(concatErrors(errors));
+  }
 }
 
 function concatErrors(errors: t.Error[]): t.Error {
@@ -116,11 +139,23 @@ export async function writeXlsx(
   cells: t.Cell[],
   fileName: string
 ): Promise<Option<t.Error>> {
-  const [validCells, errors] = splitErrors(cells.map(validateCell));
-  if (errors.length == 0) {
-    await validatedWriteXlsx(validCells, fileName);
+  const workbook = toExcelWorkbook(cells);
+  if (workbook.ok) {
+    await workbook.val.xlsx.writeFile(fileName);
     return None;
   } else {
-    return Some(concatErrors(errors));
+    return Some(workbook.val);
+  }
+}
+
+export async function writeBinary(
+  cells: t.Cell[]
+): Promise<Result<ExcelJS.Buffer, t.Error>> {
+  const workbook = toExcelWorkbook(cells);
+  if (workbook.ok) {
+    const binary = await workbook.val.xlsx.writeBuffer();
+    return Ok(binary);
+  } else {
+    return Err(workbook.val);
   }
 }
