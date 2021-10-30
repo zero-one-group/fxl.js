@@ -54,6 +54,80 @@ export function tableToCells(table: t.Value[][]): t.Cell[] {
   );
 }
 
+function range(num: number): number[] {
+  return [...Array(num).keys()];
+}
+
+export function cellsToTable(cells: t.Cell[]): t.Value[][] {
+  const cellLookup: Record<string, t.Value> = {};
+  cells.forEach((cell) => {
+    cellLookup[JSON.stringify(cell.coord)] = cell.value;
+  });
+
+  return range(maxRow(cells) + 1).map((rowIndex) => {
+    return range(maxCol(cells) + 1).map((colIndex) => {
+      const coord = { row: rowIndex, col: colIndex };
+      return cellLookup[JSON.stringify(coord)];
+    });
+  });
+}
+
+export function maxRow(cells: t.Cell[]): number {
+  if (cells.length == 0) {
+    return -1;
+  } else {
+    const rowIndices = cells.map((cell) => cell.coord.row);
+    return Math.max(...rowIndices);
+  }
+}
+
+export function shiftDown(shift: number, cell: t.Cell): t.Cell {
+  const newCoord = { row: cell.coord.row + shift, col: cell.coord.col };
+  return { ...cell, coord: newCoord };
+}
+
+export function shiftUp(shift: number, cell: t.Cell): t.Cell {
+  return shiftDown(-shift, cell);
+}
+
+export function maxCol(cells: t.Cell[]): number {
+  if (cells.length == 0) {
+    return -1;
+  } else {
+    const colIndices = cells.map((cell) => cell.coord.col);
+    return Math.max(...colIndices);
+  }
+}
+
+export function shiftRight(shift: number, cell: t.Cell): t.Cell {
+  const newCoord = { row: cell.coord.row, col: cell.coord.col + shift };
+  return { ...cell, coord: newCoord };
+}
+
+export function shiftLeft(shift: number, cell: t.Cell): t.Cell {
+  return shiftRight(-shift, cell);
+}
+
+function concatBelowTwoGroups(left: t.Cell[], right: t.Cell[]): t.Cell[] {
+  const shift = maxRow(left) + 1;
+  const shiftedRight = right.map((cell) => shiftDown(shift, cell));
+  return left.concat(shiftedRight);
+}
+
+export function concatBelow(...cellGroups: t.Cell[][]): t.Cell[] {
+  return cellGroups.reduce(concatBelowTwoGroups);
+}
+
+function concatRightTwoGroups(left: t.Cell[], right: t.Cell[]): t.Cell[] {
+  const shift = maxCol(left) + 1;
+  const shiftedRight = right.map((cell) => shiftRight(shift, cell));
+  return left.concat(shiftedRight);
+}
+
+export function concatRight(...cellGroups: t.Cell[][]): t.Cell[] {
+  return cellGroups.reduce(concatRightTwoGroups);
+}
+
 export function validateCoord(coord: t.Coord): Result<t.ValidCoord, t.Error> {
   if (
     coord.row >= 0 &&

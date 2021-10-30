@@ -25,6 +25,55 @@ function extractOk<T, U>(result: Result<T, U>): T {
 }
 
 describe('basic coordinate helper functions', () => {
+  const table = fxl.tableToCells([
+    ['a', 'b'],
+    ['x', 'y'],
+  ]);
+  const column = fxl.colToCells([undefined, true, false]);
+  const row = fxl.rowToCells([1, undefined, 3]);
+
+  it('concatBelow should work properly', () => {
+    const cells = fxl.concatBelow(table, row);
+    const outputTable = fxl.cellsToTable(cells);
+    expect(outputTable).toEqual([
+      ['a', 'b', undefined],
+      ['x', 'y', undefined],
+      [1, undefined, 3],
+    ]);
+  });
+
+  it('concatRight should work properly', () => {
+    const cells = fxl.concatRight(table, column);
+    const outputTable = fxl.cellsToTable(cells);
+    expect(outputTable).toEqual([
+      ['a', 'b', undefined],
+      ['x', 'y', true],
+      [undefined, undefined, false],
+    ]);
+  });
+
+  it('maxRow and maxCol should work properly', () => {
+    expect(fxl.maxRow(table)).toBe(1);
+    expect(fxl.maxCol(table)).toBe(1);
+    expect(fxl.maxRow(column)).toBe(2);
+    expect(fxl.maxCol(column)).toBe(0);
+    expect(fxl.maxRow(row)).toBe(0);
+    expect(fxl.maxCol(row)).toBe(2);
+    expect(fxl.maxRow([])).toBe(-1);
+    expect(fxl.maxCol([])).toBe(-1);
+  });
+
+  it('shift functions should work properly ', () => {
+    const shiftedUp = table.map((x) => fxl.shiftUp(10, x));
+    expect(fxl.maxRow(shiftedUp)).toBe(-9);
+    expect(fxl.maxCol(shiftedUp)).toBe(1);
+    const shiftedLeft = table.map((x) => fxl.shiftLeft(5, x));
+    expect(fxl.maxRow(shiftedLeft)).toBe(1);
+    expect(fxl.maxCol(shiftedLeft)).toBe(-4);
+  });
+});
+
+describe('basic cell creation helper functions', () => {
   const values = ['a', 'b', 123, 789];
   const records = [
     { a: 1, b: 2 },
@@ -69,6 +118,11 @@ describe('basic coordinate helper functions', () => {
     expect(firstRow).toEqual(['x', 'y']);
     const secondCol = cells.filter((x) => x.coord.col == 1).map((x) => x.value);
     expect(secondCol).toEqual(['y', false]);
+  });
+
+  it('cellsToTable should work properly', () => {
+    const cells = fxl.tableToCells(table);
+    expect(table).toEqual(fxl.cellsToTable(cells));
   });
 });
 
