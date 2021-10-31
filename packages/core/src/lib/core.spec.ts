@@ -34,18 +34,22 @@ describe('common style functions', () => {
     it('font functions should work', () => {
       const styled = fxl.pipe(
         cell,
-        fxl.bold,
-        fxl.italic,
-        fxl.underline,
+        fxl.setBold(true),
+        fxl.setItalic(true),
+        fxl.setUnderline(false),
+        fxl.setStrike(false),
         fxl.setFontName('Roboto'),
-        fxl.setFontSize(4)
+        fxl.setFontSize(4),
+        fxl.setFontColor('FF00FF00')
       );
       expect(styled?.style?.font).toEqual({
         bold: true,
         italic: true,
-        underline: true,
+        underline: false,
+        strike: false,
         name: 'Roboto',
         size: 4,
+        color: { argb: 'FF00FF00' },
       });
     });
   });
