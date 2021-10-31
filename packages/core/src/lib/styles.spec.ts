@@ -68,6 +68,14 @@ describe('shortcut functions for styling', () => {
           color: { argb: 'FFCCFFCC' },
         },
       });
+
+      const border = styles.toBorder('dotted', 'green');
+      expect(styles.setAllBorders(border)(cell)?.style?.border).toEqual({
+        top: border,
+        right: border,
+        bottom: border,
+        left: border,
+      });
     });
 
     it('alignment shortcut functions', () => {
@@ -104,6 +112,29 @@ describe('shortcut functions for styling', () => {
         size: 4,
         color: { argb: 'FF00FF00' },
       });
+    });
+  });
+
+  it('conditional application functions should work properly', () => {
+    const styled = hof.pipe(
+      toCell('abc'),
+      hof.applyIf((cell) => cell.value == 'abc', styles.setBold(true)),
+      hof.applyIf((cell) => cell.value == 'xyz', styles.setItalic(true)),
+      hof.applyIfElse(
+        (cell) => cell.coord.row == 0,
+        styles.setUnderline(true),
+        styles.setFontName('Roboto')
+      ),
+      hof.applyIfElse(
+        (cell) => cell.coord.col == 1,
+        styles.setUnderline(true),
+        styles.setFontSize(4)
+      )
+    );
+    expect(styled?.style?.font).toEqual({
+      bold: true,
+      underline: true,
+      size: 4,
     });
   });
 });

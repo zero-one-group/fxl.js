@@ -9,6 +9,15 @@ describe('basic coordinate helper functions', () => {
   const column = coords.colToCells([undefined, true, false]);
   const row = coords.rowToCells([1, undefined, 3]);
 
+  it('setSheet should work properly', () => {
+    const cells = row.map(coords.setSheet('abc-xyz'));
+    expect(cells.map((x) => x.coord.sheet)).toEqual([
+      'abc-xyz',
+      'abc-xyz',
+      'abc-xyz',
+    ]);
+  });
+
   it('concatBelow should work properly', () => {
     const cells = coords.concatBelow(table, row);
     const outputTable = coords.cellsToTable(cells);

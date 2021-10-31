@@ -15,6 +15,9 @@
   "projects": {
     "core": {
       "tags": ["scope:public", "type:util", "target:all"]
+    },
+    "example": {
+      "tags": []
     }
   }
 }

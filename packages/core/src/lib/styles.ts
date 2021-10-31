@@ -8,9 +8,9 @@ export function setNumFmt(numFmt: string): t.Monoid<t.Cell> {
   };
 }
 
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 // Fill Shortcuts
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 export const DEFAULT_FILL: t.Fill = { type: 'pattern', pattern: 'none' };
 
 export function setFill(fill: t.Fill): t.Monoid<t.Cell> {
@@ -49,9 +49,9 @@ export function setSolidBg(color: string): t.Monoid<t.Cell> {
   });
 }
 
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 // Border Shortcuts
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 function getBorders(cell: t.Cell): t.Borders {
   return cell.style?.border || {};
 }
@@ -60,6 +60,19 @@ export function setBorders(borders: t.Borders): t.Monoid<t.Cell> {
   return (cell: t.Cell) => {
     const style = { ...cell.style, border: borders };
     return { ...cell, style: style };
+  };
+}
+
+export function setAllBorders(border: t.Border): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const borders = {
+      ...getBorders(cell),
+      top: border,
+      right: border,
+      bottom: border,
+      left: border,
+    };
+    return setBorders(borders)(cell);
   };
 }
 
@@ -77,9 +90,9 @@ export function toBorder(style: t.BorderStyle, color: string): t.Border {
   return { style: style, color: toColor(color) };
 }
 
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 // Alignment Shortcuts
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 function getAlignment(cell: t.Cell): t.Alignment {
   return cell.style?.alignment || {};
 }
@@ -116,9 +129,9 @@ export function setWrapText(wrapText: boolean): t.Monoid<t.Cell> {
   };
 }
 
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 // Font Shortcuts
-///////////////////////////////////////////////////////////////////////////////
+// ---------------------------------------------------------------------------
 function getFont(cell: t.Cell): t.Font {
   return cell.style?.font || {};
 }
