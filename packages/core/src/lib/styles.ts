@@ -63,6 +63,19 @@ export function setBorders(borders: t.Borders): t.Monoid<t.Cell> {
   };
 }
 
+export function setAllBorders(border: t.Border): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const borders = {
+      ...getBorders(cell),
+      top: border,
+      right: border,
+      bottom: border,
+      left: border,
+    };
+    return setBorders(borders)(cell);
+  };
+}
+
 export function setBorder(
   side: 'top' | 'right' | 'bottom' | 'left',
   border: t.Border

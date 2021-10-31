@@ -68,6 +68,14 @@ describe('shortcut functions for styling', () => {
           color: { argb: 'FFCCFFCC' },
         },
       });
+
+      const border = styles.toBorder('dotted', 'green');
+      expect(styles.setAllBorders(border)(cell)?.style?.border).toEqual({
+        top: border,
+        right: border,
+        bottom: border,
+        left: border,
+      });
     });
 
     it('alignment shortcut functions', () => {
