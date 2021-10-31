@@ -114,4 +114,27 @@ describe('shortcut functions for styling', () => {
       });
     });
   });
+
+  it('conditional application functions should work properly', () => {
+    const styled = hof.pipe(
+      toCell('abc'),
+      hof.applyIf((cell) => cell.value == 'abc', styles.setBold(true)),
+      hof.applyIf((cell) => cell.value == 'xyz', styles.setItalic(true)),
+      hof.applyIfElse(
+        (cell) => cell.coord.row == 0,
+        styles.setUnderline(true),
+        styles.setFontName('Roboto')
+      ),
+      hof.applyIfElse(
+        (cell) => cell.coord.col == 1,
+        styles.setUnderline(true),
+        styles.setFontSize(4)
+      )
+    );
+    expect(styled?.style?.font).toEqual({
+      bold: true,
+      underline: true,
+      size: 4,
+    });
+  });
 });
