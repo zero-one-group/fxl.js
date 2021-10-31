@@ -24,6 +24,37 @@ function extractOk<T, U>(result: Result<T, U>): T {
   }
 }
 
+describe('common style functions', () => {
+  const cells = [
+    { value: undefined, coord: { row: 1, col: 2 } },
+    fxl.toCell('abc'),
+  ];
+
+  cells.forEach((cell) => {
+    it('font functions should work', () => {
+      const styled = fxl.pipe(
+        cell,
+        fxl.setBold(true),
+        fxl.setItalic(true),
+        fxl.setUnderline(false),
+        fxl.setStrike(false),
+        fxl.setFontName('Roboto'),
+        fxl.setFontSize(4),
+        fxl.setFontColor('FF00FF00')
+      );
+      expect(styled?.style?.font).toEqual({
+        bold: true,
+        italic: true,
+        underline: false,
+        strike: false,
+        name: 'Roboto',
+        size: 4,
+        color: { argb: 'FF00FF00' },
+      });
+    });
+  });
+});
+
 describe('cell style capture', () => {
   it('readXlsx shold capture style properties', async () => {
     const result = await fxl.readXlsx(XLSX_PATH);
