@@ -1,6 +1,13 @@
 import { toCell } from './cells';
 import * as t from './types';
 
+export function setSheet(sheetName: string): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const coord = { ...cell.coord, sheet: sheetName };
+    return { ...cell, coord: coord };
+  };
+}
+
 export function rowToCells(values: t.Value[]): t.Cell[] {
   return values.map((value, index) => ({
     value: value,
