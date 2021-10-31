@@ -1,6 +1,6 @@
 import { toCell } from './cells';
 import { toAlphaColor } from './colors';
-import * as core from './core';
+import * as hof from './higher-order-functions';
 import * as styles from './styles';
 
 describe('shortcut functions for styling', () => {
@@ -43,7 +43,7 @@ describe('shortcut functions for styling', () => {
     });
 
     it('borders shortcut function', () => {
-      const styled = core.pipe(
+      const styled = hof.pipe(
         cell,
         styles.setBorder('left', {}),
         styles.setBorder('top', styles.toBorder('thin', 'red')),
@@ -71,12 +71,12 @@ describe('shortcut functions for styling', () => {
     });
 
     it('alignment shortcut functions', () => {
-      const styled = core.pipe(
-        cell,
+      const alignFn = hof.compose(
         styles.setHorizontalAlignement('center'),
         styles.setVerticalAlignement('top'),
         styles.setWrapText(true)
       );
+      const styled = alignFn(cell);
       expect(styled?.style?.alignment).toEqual({
         horizontal: 'center',
         vertical: 'top',
@@ -85,7 +85,7 @@ describe('shortcut functions for styling', () => {
     });
 
     it('font shortcut functions', () => {
-      const styled = core.pipe(
+      const styled = hof.pipe(
         cell,
         styles.setBold(true),
         styles.setItalic(true),
