@@ -1,23 +1,11 @@
 import * as t from './types';
-
-// TODO: handle incorrect hexes or make it type safe
-// TODO: expand color shortcuts
-export const COLOR_ARGBS: Record<string, string> = {
-  red: 'FFFF0000',
-  blue: 'FF0000FF',
-  black: 'FF000000',
-  white: 'FFFFFFFF',
-};
+import { toColor } from './colors';
 
 export function setNumFmt(numFmt: string): t.Monoid<t.Cell> {
   return (cell: t.Cell) => {
     const style = { ...cell.style, numFmt: numFmt };
     return { ...cell, style: style };
   };
-}
-
-export function toColor(color: string): t.Color {
-  return { argb: COLOR_ARGBS[color] || color };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,14 +22,14 @@ export function setFill(fill: t.Fill): t.Monoid<t.Cell> {
 
 export function toFill(
   pattern: t.FillPatterns,
-  fgColor: string,
-  bgColor: string
+  fgColor: t.Color,
+  bgColor: t.Color
 ): t.Fill {
   return {
     type: 'pattern',
     pattern: pattern,
-    fgColor: toColor(fgColor),
-    bgColor: toColor(bgColor),
+    fgColor: fgColor,
+    bgColor: bgColor,
   };
 }
 
@@ -186,8 +174,7 @@ export function setFontSize(fontSize: number): t.Monoid<t.Cell> {
 
 export function setFontColor(fontColor: string): t.Monoid<t.Cell> {
   return (cell: t.Cell) => {
-    const color = { argb: fontColor };
-    const font = { ...getFont(cell), color: color };
+    const font = { ...getFont(cell), color: toColor(fontColor) };
     return setFont(font)(cell);
   };
 }

@@ -1,4 +1,5 @@
 import { toCell } from './cells';
+import { toAlphaColor } from './colors';
 import * as core from './core';
 import * as styles from './styles';
 
@@ -15,7 +16,11 @@ describe('shortcut functions for styling', () => {
     });
 
     it('fill shortcut function', () => {
-      const fill = styles.toFill('none', 'red', 'black');
+      const fill = styles.toFill(
+        'none',
+        toAlphaColor('FF', 'FF0000'),
+        toAlphaColor('FF', 'black')
+      );
       const styled = styles.setFill(fill)(cell);
       expect(styled?.style?.fill).toEqual({
         type: 'pattern',
