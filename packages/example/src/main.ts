@@ -49,6 +49,56 @@ const formData = {
 // ---------------------------------------------------------------------------
 // Styles
 // ---------------------------------------------------------------------------
+function setFormStyle(cell: fxl.Cell): fxl.Cell {
+  const border = fxl.toBorder('medium', 'black');
+  const setBorders = fxl.setAllBorders(border);
+  if (cell.coord.col == 0) {
+    return fxl.pipe(
+      cell,
+      setBorders,
+      fxl.setBold(true),
+      fxl.setHorizontalAlignement('right'),
+      fxl.setSolidFg('light_gray')
+    );
+  } else {
+    return fxl.pipe(cell, setBorders, fxl.setHorizontalAlignement('center'));
+  }
+}
+
+function highlightShortage(cell: fxl.Cell): fxl.Cell {
+  if (typeof cell.value == 'number') {
+    if (cell.value > 100) {
+      return cell;
+    } else if (cell.value > 0) {
+      return fxl.setSolidFg('yellow')(cell);
+    } else {
+      return fxl.pipe(cell, fxl.setSolidFg('red'), fxl.setFontColor('white'));
+    }
+  } else {
+    return cell;
+  }
+}
+
+function setInventoryStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(
+    cell,
+    highlightShortage,
+    fxl.setHorizontalAlignement('center'),
+    fxl.setAllBorders(fxl.toBorder('thin', 'black')),
+    fxl.applyIf(
+      (cell) => cell.coord.row != 0 && cell.coord.col != 0,
+      fxl.setNumFmt('#,##0')
+    ),
+    fxl.applyIf(
+      (cell) => cell.coord.row <= 1 || cell.coord.col == 0,
+      fxl.compose(fxl.setBold(true), fxl.setSolidFg('light_gray'))
+    ),
+    fxl.applyIf(
+      (cell) => cell.coord.row != 0 && cell.coord.col == 0,
+      fxl.setHorizontalAlignement('right')
+    )
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Cells
@@ -122,20 +172,23 @@ function singleQuarterInventoryCells(
     rawMaterialColumnCells,
     ...months.map(singleMonthInventoryCells)
   );
-  return fxl.concatBelow(headerCells, bodyCells);
+  return fxl.concatBelow(headerCells, bodyCells).map(setInventoryStyle);
 }
 
 const inventoryCells = fxl.concatBelow(
-  fxl.padBelow(1, singleQuarterInventoryCells('Q1', ['Jan', 'Feb', 'Mar'])),
-  fxl.padBelow(1, singleQuarterInventoryCells('Q2', ['Apr', 'May', 'Jun'])),
-  fxl.padBelow(1, singleQuarterInventoryCells('Q3', ['Jul', 'Aug', 'Sep'])),
+  fxl.padBelow(2, singleQuarterInventoryCells('Q1', ['Jan', 'Feb', 'Mar'])),
+  fxl.padBelow(2, singleQuarterInventoryCells('Q2', ['Apr', 'May', 'Jun'])),
+  fxl.padBelow(2, singleQuarterInventoryCells('Q3', ['Jul', 'Aug', 'Sep'])),
   singleQuarterInventoryCells('Q4', ['Oct', 'Nov', 'Dec'])
 );
 
 const allCells = fxl.concatBelow(
-  fxl.padBelow(2, formHeaderCells),
+  fxl.padBelow(2, formHeaderCells.map(setFormStyle)),
   fxl.padBelow(2, inventoryCells),
-  fxl.concatRight(fxl.padRight(2, createFooterCells), checkFooterCells)
+  fxl.concatRight(
+    fxl.padRight(2, createFooterCells.map(setFormStyle)),
+    checkFooterCells.map(setFormStyle)
+  )
 );
 
 fxl.writeXlsx(allCells, 'temp.xlsx');
