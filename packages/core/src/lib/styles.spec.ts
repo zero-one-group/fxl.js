@@ -14,6 +14,57 @@ describe('shortcut functions for styling', () => {
       expect(styled.style).toEqual({ numFmt: 'dd/mm/yyyy' });
     });
 
+    it('fill shortcut function', () => {
+      const fill = styles.toFill('none', 'red', 'black');
+      const styled = styles.setFill(fill)(cell);
+      expect(styled?.style?.fill).toEqual({
+        type: 'pattern',
+        pattern: 'none',
+        fgColor: { argb: 'FFFF0000' },
+        bgColor: { argb: 'FF000000' },
+      });
+
+      expect(styles.setSolidFg('white')(cell)?.style?.fill).toEqual({
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFFFFF' },
+      });
+
+      expect(styles.setSolidBg('blue')(cell)?.style?.fill).toEqual({
+        type: 'pattern',
+        pattern: 'solid',
+        bgColor: { argb: 'FF0000FF' },
+      });
+    });
+
+    it('borders shortcut function', () => {
+      const styled = core.pipe(
+        cell,
+        styles.setBorder('left', {}),
+        styles.setBorder('top', styles.toBorder('thin', 'red')),
+        styles.setBorder('bottom', styles.toBorder('dashDot', 'FFFFFFFF')),
+        styles.setBorder('right', {
+          style: 'medium',
+          color: { argb: 'FFCCFFCC' },
+        })
+      );
+      expect(styled?.style?.border).toEqual({
+        left: {},
+        top: {
+          style: 'thin',
+          color: { argb: 'FFFF0000' },
+        },
+        bottom: {
+          style: 'dashDot',
+          color: { argb: 'FFFFFFFF' },
+        },
+        right: {
+          style: 'medium',
+          color: { argb: 'FFCCFFCC' },
+        },
+      });
+    });
+
     it('alignment shortcut functions', () => {
       const styled = core.pipe(
         cell,

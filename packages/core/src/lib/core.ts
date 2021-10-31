@@ -153,6 +153,7 @@ export async function writeBinary(
   }
 }
 
+// TODO: isolate to higher-order-functions.ts and add compose
 export function pipe<T>(init: T, ...fns: t.Monoid<T>[]): T {
   return fns.reduce((acc: T, fn: t.Monoid<T>) => fn(acc), init);
 }

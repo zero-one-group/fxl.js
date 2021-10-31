@@ -26,6 +26,20 @@ export type HorizontalAlignment = ExcelJS.Alignment['horizontal'];
 
 export type VerticalAlignment = ExcelJS.Alignment['vertical'];
 
+export type Borders = Partial<ExcelJS.Borders>;
+
+export type Border = Partial<ExcelJS.Border>;
+
+export type BorderStyle = Partial<ExcelJS.BorderStyle>;
+
+export type Fill = ExcelJS.Fill;
+
+export type FillPatterns = ExcelJS.FillPatterns;
+
+export interface Color {
+  argb: string;
+}
+
 export interface Cell {
   value: Value;
   coord: Coord;
