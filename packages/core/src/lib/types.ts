@@ -20,6 +20,12 @@ export type Style = Partial<ExcelJS.Style>;
 
 export type Font = Partial<ExcelJS.Font>;
 
+export type Alignment = Partial<ExcelJS.Alignment>;
+
+export type HorizontalAlignment = ExcelJS.Alignment['horizontal'];
+
+export type VerticalAlignment = ExcelJS.Alignment['vertical'];
+
 export interface Cell {
   value: Value;
   coord: Coord;

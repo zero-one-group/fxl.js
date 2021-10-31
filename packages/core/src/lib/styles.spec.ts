@@ -9,6 +9,25 @@ describe('shortcut functions for styling', () => {
   ];
 
   cells.forEach((cell) => {
+    it('number format shortcut function', () => {
+      const styled = styles.setNumFmt('dd/mm/yyyy')(cell);
+      expect(styled.style).toEqual({ numFmt: 'dd/mm/yyyy' });
+    });
+
+    it('alignment shortcut functions', () => {
+      const styled = core.pipe(
+        cell,
+        styles.setHorizontalAlignement('center'),
+        styles.setVerticalAlignement('top'),
+        styles.setWrapText(true)
+      );
+      expect(styled?.style?.alignment).toEqual({
+        horizontal: 'center',
+        vertical: 'top',
+        wrapText: true,
+      });
+    });
+
     it('font shortcut functions', () => {
       const styled = core.pipe(
         cell,

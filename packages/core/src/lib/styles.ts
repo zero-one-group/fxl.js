@@ -1,5 +1,58 @@
 import * as t from './types';
 
+// TODO: setBorders, setTopBorder, setRightBorder, setBottomBorder, setLeftBorder
+// TODO: setFills, setFgFill, setBgFill
+// TODO: color shortcuts
+
+export function setNumFmt(numFmt: string): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const style = { ...cell.style, numFmt: numFmt };
+    return { ...cell, style: style };
+  };
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Alignment Shortcuts
+///////////////////////////////////////////////////////////////////////////////
+function getAlignment(cell: t.Cell): t.Alignment {
+  return cell.style?.alignment || {};
+}
+
+export function setAlignment(alignment: t.Alignment): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const style = { ...cell.style, alignment: alignment };
+    return { ...cell, style: style };
+  };
+}
+
+export function setHorizontalAlignement(
+  horizontal: t.HorizontalAlignment
+): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const alignment = { ...getAlignment(cell), horizontal: horizontal };
+    return setAlignment(alignment)(cell);
+  };
+}
+
+export function setVerticalAlignement(
+  vertical: t.VerticalAlignment
+): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const alignment = { ...getAlignment(cell), vertical: vertical };
+    return setAlignment(alignment)(cell);
+  };
+}
+
+export function setWrapText(wrapText: boolean): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => {
+    const alignment = { ...getAlignment(cell), wrapText: wrapText };
+    return setAlignment(alignment)(cell);
+  };
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Font Shortcuts
+///////////////////////////////////////////////////////////////////////////////
 function getFont(cell: t.Cell): t.Font {
   return cell.style?.font || {};
 }
@@ -60,9 +113,3 @@ export function setFontColor(fontColor: string): t.Monoid<t.Cell> {
     return setFont(font)(cell);
   };
 }
-
-// TODO: setAligement, setHorizontalAlignement, setVerticalAlignment, setWrapText
-// TODO: setBorders, setTopBorder, setRightBorder, setBottomBorder, setLeftBorder
-// TODO: setNumFmt
-// TODO: setFills, setFgFill, setBgFill
-// TODO: color shortcuts
