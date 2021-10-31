@@ -1,5 +1,5 @@
-import * as t from './types';
 import { toColor } from './colors';
+import * as t from './types';
 
 export function setNumFmt(numFmt: string): t.Monoid<t.Cell> {
   return (cell: t.Cell) => {
