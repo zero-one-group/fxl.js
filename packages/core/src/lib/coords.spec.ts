@@ -1,5 +1,4 @@
 import * as coords from './coords';
-import * as core from './core';
 
 describe('basic coordinate helper functions', () => {
   const table = coords.tableToCells([
@@ -119,7 +118,6 @@ describe('basic cell creation helper functions', () => {
 
   it('rowToCells should work properly', () => {
     const cells = coords.rowToCells(values);
-    expect(cells.map(core.validateCell).filter((x) => x.err)).toEqual([]);
     expect(cells.map((x) => x.value)).toEqual(values);
     const rangeArray = [...Array(values.length).keys()];
     expect(cells.map((x) => x.coord.col)).toEqual(rangeArray);
@@ -128,7 +126,6 @@ describe('basic cell creation helper functions', () => {
 
   it('colToCells should work properly', () => {
     const cells = coords.colToCells(values);
-    expect(cells.map(core.validateCell).filter((x) => x.err)).toEqual([]);
     expect(cells.map((x) => x.value)).toEqual(values);
     const rangeArray = [...Array(values.length).keys()];
     expect(cells.map((x) => x.coord.row)).toEqual(rangeArray);
@@ -137,7 +134,6 @@ describe('basic cell creation helper functions', () => {
 
   it('recordToCells should work properly', () => {
     const cells = coords.recordsToCells(['a', 'b'], records);
-    expect(cells.map(core.validateCell).filter((x) => x.err)).toEqual([]);
     const firstRow = cells.filter((x) => x.coord.row == 0).map((x) => x.value);
     expect(firstRow).toEqual([1, 2]);
     const secondCol = cells.filter((x) => x.coord.col == 1).map((x) => x.value);
@@ -146,7 +142,6 @@ describe('basic cell creation helper functions', () => {
 
   it('tableToCells should work properly', () => {
     const cells = coords.tableToCells(table);
-    expect(cells.map(core.validateCell).filter((x) => x.err)).toEqual([]);
     const firstRow = cells.filter((x) => x.coord.row == 0).map((x) => x.value);
     expect(firstRow).toEqual(['x', 'y']);
     const secondCol = cells.filter((x) => x.coord.col == 1).map((x) => x.value);

@@ -2,37 +2,9 @@ import * as ExcelJS from 'exceljs';
 import { Ok, Err, Result, Option, Some, None } from 'ts-results';
 
 import * as t from './types';
+import { concatErrors, splitErrors, validateCell } from './validation';
 
 const DEFAULT_SHEET_NAME = 'Sheet 1';
-const MAX_ROWS = Math.round(1e5);
-const MAX_COLS = Math.round(1e4);
-
-export function validateCoord(coord: t.Coord): Result<t.ValidCoord, t.Error> {
-  if (
-    coord.row >= 0 &&
-    coord.row <= MAX_ROWS &&
-    coord.col >= 0 &&
-    coord.col <= MAX_COLS
-  ) {
-    return Ok(coord as t.ValidCoord);
-  } else {
-    const prettyCoord = JSON.stringify(coord, null, 2);
-    return Err({ error: `invalid coordinate range in ${prettyCoord}` });
-  }
-}
-
-export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
-  const errors = [];
-  const validated = validateCoord(cell.coord);
-  if (validated.err) {
-    errors.push(validated.val);
-  }
-  if (errors.length == 0) {
-    return Ok(cell as t.ValidCell);
-  } else {
-    return Err(concatErrors(errors));
-  }
-}
 
 function readExcelCell(
   cell: ExcelJS.Cell,
@@ -146,30 +118,12 @@ function toExcelWorkbook(cells: t.Cell[]): Result<ExcelJS.Workbook, t.Error> {
   const [validCells, errors] = splitErrors(cells.map(validateCell));
   if (errors.length == 0) {
     const workbook = new ExcelJS.Workbook();
-    setCells(workbook, validCells); // TODO: return scan results here
+    setCells(workbook, validCells);
     setCellSizes(workbook, validCells);
     return Ok(workbook);
   } else {
     return Err(concatErrors(errors));
   }
-}
-
-function concatErrors(errors: t.Error[]): t.Error {
-  return { error: errors.map((x) => x.error).join('\n') };
-}
-
-function splitErrors<T, U>(results: Result<T, U>[]): [T[], U[]] {
-  const values: T[] = [];
-  const errors: U[] = [];
-  results.forEach((result) => {
-    if (result.ok) {
-      values.push(result.val);
-    }
-    if (result.err) {
-      errors.push(result.val);
-    }
-  });
-  return [values, errors];
 }
 
 export async function writeXlsx(

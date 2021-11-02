@@ -14,8 +14,6 @@ export interface Coord {
   sheet?: string;
 }
 
-export type ValidCoord = Opaque<'ValidCoord', Coord>;
-
 export interface Style extends Partial<ExcelJS.Style> {
   colWidth?: number;
   rowHeight?: number;
@@ -39,6 +37,8 @@ export type BorderStyle = Partial<ExcelJS.BorderStyle>;
 
 export type Fill = ExcelJS.Fill;
 
+export type FillPattern = ExcelJS.FillPattern;
+
 export type FillPatterns = ExcelJS.FillPatterns;
 
 export interface Color {
@@ -54,3 +54,7 @@ export interface Cell {
 export type ValidCell = Opaque<'ValidCell', Cell>;
 
 export type Monoid<T> = (arg: T) => T;
+
+export function isFillPattern(fill: Fill): fill is FillPattern {
+  return fill.type == 'pattern';
+}
