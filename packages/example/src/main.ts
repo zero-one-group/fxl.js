@@ -38,7 +38,7 @@ const rawMaterials = unique(
     values(monthsInventory).flatMap((quantities) => keys(quantities))
   )
 );
-const timestamp = new Date().toISOString();
+const timestamp = new Date().toDateString();
 const formData = {
   docId: 'F-ABC-123',
   revisionNumber: 2,
@@ -98,6 +98,15 @@ function setInventoryStyle(cell: fxl.Cell): fxl.Cell {
       fxl.setHorizontalAlignement('right')
     )
   );
+}
+
+function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
+  if (cell.value) {
+    const colWidth = Math.max(cell.value.toString().length, 10);
+    return { ...cell, style: { ...cell.style, colWidth: colWidth } };
+  } else {
+    return cell;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -191,6 +200,6 @@ const allCells = fxl.concatBelow(
   )
 );
 
-fxl.writeXlsx(allCells, 'inventory-report.xlsx');
+fxl.writeXlsx(allCells.map(setAutoColWidth), 'inventory-report.xlsx');
 
 console.log(`Wrote to inventory-report.xlsx!\n${new Date()}\n__________`);
