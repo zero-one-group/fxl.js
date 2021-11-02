@@ -42,8 +42,30 @@ export function validateFontColor(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+// TODO: test hand-coded color (without argb)
+// TODO: test unhappy path of validateBorderColors
+// TODO: test fg and bgcolors
+// TODO: validate fontSize, colWidth, rowHeight, fontName
+export function validateBorderColors(cell: t.Cell): Result<t.Cell, t.Error> {
+  const borders = [
+    cell.style?.border?.top?.color?.argb,
+    cell.style?.border?.right?.color?.argb,
+    cell.style?.border?.bottom?.color?.argb,
+    cell.style?.border?.left?.color?.argb,
+  ];
+  if (borders.every(isValidArgb)) {
+    return Ok(cell);
+  } else {
+    return toError('border color', cell);
+  }
+}
+
 export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
-  const validationResults = [validateCoord(cell), validateFontColor(cell)];
+  const validationResults = [
+    validateCoord,
+    validateFontColor,
+    validateBorderColors,
+  ].map((fn) => fn(cell));
   const [, errors] = splitErrors(validationResults);
   if (errors.length == 0) {
     return Ok(cell as t.ValidCell);
