@@ -67,16 +67,19 @@ describe('cell style capture', () => {
     expect(cells.filter((x) => x?.style?.font?.bold).length).toBe(1);
   });
 
-  it('read-then-right should preserve style', async () => {
+  it('write-then-read should preserve style (except for cell sizes)', async () => {
     const font = { name: 'Roboto', size: 13 };
-    const cell = { ...toCell('abc'), style: { font: font } };
+    const style = { font: font, rowHeight: 100, colWidth: 12 };
+    const cell = { ...toCell('abc-def'), style: style };
     const writeResult = await core.writeBinary([cell]);
     const readResult = await core.readBinary(utils.extractOk(writeResult));
     const loaded = utils.extractOk(readResult);
     expect(loaded.map((x) => x?.style?.font)).toEqual([font]);
+    expect(loaded.map((x) => x?.style?.colWidth)).toEqual([undefined]);
+    expect(loaded.map((x) => x?.style?.rowHeight)).toEqual([undefined]);
   });
 
-  it('read-then-right without style should work', async () => {
+  it('write-then-read without style should work', async () => {
     const cell = { value: 'abc', coord: { row: 1, col: 1 } };
     const writeResult = await core.writeBinary([cell]);
     const readResult = await core.readBinary(utils.extractOk(writeResult));

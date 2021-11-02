@@ -106,7 +106,7 @@ function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
   cells.forEach((cell) => {
     const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
     const { row: row, col: col } = cell.coord;
-    const colWidth = cell?.style?.colWidth;
+    const colWidth = cell.style?.colWidth;
     if (colWidth) {
       const sheetColWidths = colWidths.get(sheetName) || new Map();
       const thisColWidths = sheetColWidths.get(col) || [];
@@ -114,7 +114,7 @@ function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
       sheetColWidths.set(col, thisColWidths);
       colWidths.set(sheetName, sheetColWidths);
     }
-    const rowHeight = cell?.style?.rowHeight;
+    const rowHeight = cell.style?.rowHeight;
     if (rowHeight) {
       const sheetRowHeights = rowHeights.get(sheetName) || new Map();
       const thisRowHeights = sheetRowHeights.get(row) || [];

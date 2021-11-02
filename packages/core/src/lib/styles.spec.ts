@@ -15,6 +15,16 @@ describe('shortcut functions for styling', () => {
       expect(styled.style).toEqual({ numFmt: 'dd/mm/yyyy' });
     });
 
+    it('cell-size shortcut functions', () => {
+      const styled = hof.pipe(
+        cell,
+        styles.setColWidth(12),
+        styles.setRowHeight(100)
+      );
+      expect(styled?.style?.colWidth).toBe(12);
+      expect(styled?.style?.rowHeight).toBe(100);
+    });
+
     it('fill shortcut function', () => {
       const fill = styles.toFill(
         'none',
