@@ -1,9 +1,10 @@
 import * as ExcelJS from 'exceljs';
 import * as temp from 'temp';
 
-import { toCell } from './cells';
 import * as core from './core';
 import * as utils from './test-utils';
+import { toCell } from './cells';
+import { validateCell } from './validation';
 
 temp.track();
 
@@ -14,7 +15,7 @@ describe('basic reading and writing xlsx', () => {
     const result = await core.readXlsx(XLSX_PATH);
     const cells = utils.extractOk(result);
     expect(cells.length).toBe(23);
-    expect(cells.map(core.validateCell).filter((x) => x.err)).toEqual([]);
+    expect(cells.map(validateCell).filter((x) => x.err)).toEqual([]);
   });
 
   it('readXlsx should fail gracefully', async () => {
@@ -85,25 +86,6 @@ describe('cell style capture', () => {
     const readResult = await core.readBinary(utils.extractOk(writeResult));
     const loaded = utils.extractOk(readResult);
     expect(loaded.map((x) => x?.style)).toEqual([{}]);
-  });
-});
-
-describe('validation functions', () => {
-  const validCoord = { row: 0, col: 0 };
-  const validCell = { value: 'abc', coord: validCoord };
-  const invalidCoord = { row: -1, col: 0 };
-  const invalidCell = { value: 'abc', coord: invalidCoord };
-
-  it('validateCoord', () => {
-    expect(core.validateCoord(validCoord).val).toEqual(validCoord);
-    const withSheet = { ...validCoord, sheet: 'ABC' };
-    expect(core.validateCoord(withSheet).val).toEqual(withSheet);
-    expect(core.validateCoord(invalidCoord).val).toHaveProperty('error');
-  });
-
-  it('validateCell should work', () => {
-    expect(core.validateCell(validCell).val).toEqual(validCell);
-    expect(core.validateCell(invalidCell).val).toHaveProperty('error');
   });
 });
 
