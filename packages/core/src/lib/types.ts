@@ -16,7 +16,16 @@ export interface Coord {
 
 export type ValidCoord = Opaque<'ValidCoord', Coord>;
 
-export type Style = Partial<ExcelJS.Style>;
+export interface Style extends Partial<ExcelJS.Style> {
+  colWidth?: cellSize;
+  rowHeight?: cellSize;
+}
+
+export type cellSize = number | 'auto';
+
+export interface CellSizes {
+  [sheetName: string]: { [index: number]: cellSize[] };
+}
 
 export type Font = Partial<ExcelJS.Font>;
 

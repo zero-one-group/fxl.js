@@ -191,6 +191,6 @@ const allCells = fxl.concatBelow(
   )
 );
 
-fxl.writeXlsx(allCells, 'temp.xlsx');
+fxl.writeXlsx(allCells, 'inventory-report.xlsx');
 
-console.log(rawMaterials, formData);
+console.log(`Wrote to inventory-report.xlsx!\n${new Date()}\n__________`);

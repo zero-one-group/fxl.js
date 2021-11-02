@@ -89,21 +89,33 @@ export async function readBinary(
   }
 }
 
+function setCells(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
+  cells.forEach((cell) => {
+    const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
+    const worksheet =
+      workbook.getWorksheet(sheetName) || workbook.addWorksheet(sheetName);
+    const excelCell = worksheet.getCell(cell.coord.row + 1, cell.coord.col + 1);
+    excelCell.value = cell.value;
+    excelCell.style = cell.style || {};
+  });
+}
+
+function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
+  // TODO
+  const colWidths: t.CellSizes = {};
+  const rowHeights: t.CellSizes = {};
+  return [colWidths, rowHeights];
+}
+
+function setCellSizes(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {}
+
 function toExcelWorkbook(cells: t.Cell[]): Result<ExcelJS.Workbook, t.Error> {
   const [validCells, errors] = splitErrors(cells.map(validateCell));
   if (errors.length == 0) {
     const workbook = new ExcelJS.Workbook();
-    validCells.forEach((cell) => {
-      const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
-      const worksheet =
-        workbook.getWorksheet(sheetName) || workbook.addWorksheet(sheetName);
-      const excelCell = worksheet.getCell(
-        cell.coord.row + 1,
-        cell.coord.col + 1
-      );
-      excelCell.value = cell.value;
-      excelCell.style = cell.style || {};
-    });
+    setCells(workbook, validCells);
+    // TODO: setCellSizes(worbook, validCells)
+    //console.log(cellSizes)
     return Ok(workbook);
   } else {
     return Err(concatErrors(errors));
