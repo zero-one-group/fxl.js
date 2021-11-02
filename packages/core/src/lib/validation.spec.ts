@@ -16,6 +16,20 @@ describe('validation functions', () => {
     expect(validateCoord(invalidCell).val).toHaveProperty('error');
   });
 
+  it('font size validation should work', () => {
+    const validFontSize = styles.setFontSize(10)(validCell);
+    expect(validateCoord(validFontSize).val).toEqual(validFontSize);
+    const invalidFontSize = styles.setFontSize(-1)(validCell);
+    expect(validateCell(invalidFontSize).val).toHaveProperty('error');
+  });
+
+  it('cell size validation should work', () => {
+    const validRowHeight = styles.setRowHeight(10)(validCell);
+    expect(validateCoord(validRowHeight).val).toEqual(validRowHeight);
+    const invalidRowHeight = styles.setRowHeight(-1)(validCell);
+    expect(validateCell(invalidRowHeight).val).toHaveProperty('error');
+  });
+
   it('color validation should work', () => {
     ['ZZ', 'ZZZZZZZZ', 'FF', '', 'FFFFFFFFFF'].forEach((color) => {
       const invalidFont = styles.setFontColor(color)(validCell);

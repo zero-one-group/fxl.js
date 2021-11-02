@@ -42,7 +42,6 @@ export function validateFontColor(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
-// TODO: validate fontSize, colWidth, rowHeight, fontName
 export function validateFillColors(cell: t.Cell): Result<t.Cell, t.Error> {
   const fill = cell.style?.fill;
   if (fill == undefined) {
@@ -72,12 +71,35 @@ export function validateBorderColors(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+export function validateFontSize(cell: t.Cell): Result<t.Cell, t.Error> {
+  const size = cell.style?.font?.size;
+  if (size == undefined || size > 0) {
+    return Ok(cell);
+  } else {
+    return toError('font size', cell);
+  }
+}
+
+export function validateCellSize(cell: t.Cell): Result<t.Cell, t.Error> {
+  const rowHeight = cell.style?.rowHeight;
+  const colWidth = cell.style?.colWidth;
+  const validHeight = rowHeight == undefined || rowHeight > 0;
+  const validWidth = colWidth == undefined || colWidth > 0;
+  if (validHeight && validWidth) {
+    return Ok(cell);
+  } else {
+    return toError('row height/col width', cell);
+  }
+}
+
 export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
   const validationResults = [
     validateCoord,
     validateFontColor,
     validateBorderColors,
     validateFillColors,
+    validateFontSize,
+    validateCellSize,
   ].map((fn) => fn(cell));
   const [, errors] = splitErrors(validationResults);
   if (errors.length == 0) {
