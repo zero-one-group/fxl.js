@@ -37,6 +37,8 @@ export type BorderStyle = Partial<ExcelJS.BorderStyle>;
 
 export type Fill = ExcelJS.Fill;
 
+export type FillPattern = ExcelJS.FillPattern;
+
 export type FillPatterns = ExcelJS.FillPatterns;
 
 export interface Color {
@@ -52,3 +54,7 @@ export interface Cell {
 export type ValidCell = Opaque<'ValidCell', Cell>;
 
 export type Monoid<T> = (arg: T) => T;
+
+export function isFillPattern(fill: Fill): fill is FillPattern {
+  return fill.type == 'pattern';
+}

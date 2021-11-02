@@ -1,4 +1,5 @@
 import * as styles from './styles';
+import * as t from './types';
 import { validateCell, validateCoord } from './validation';
 
 describe('validation functions', () => {
@@ -17,13 +18,36 @@ describe('validation functions', () => {
 
   it('color validation should work', () => {
     ['ZZ', 'ZZZZZZZZ', 'FF', '', 'FFFFFFFFFF'].forEach((color) => {
-      const unknownColor = styles.setFontColor(color)(validCell);
-      expect(validateCell(unknownColor).val).toHaveProperty('error');
+      const invalidFont = styles.setFontColor(color)(validCell);
+      expect(validateCell(invalidFont).val).toHaveProperty('error');
+      const border = styles.toBorder('thin', color);
+      const invalidBorders = styles.setAllBorders(border)(validCell);
+      expect(validateCell(invalidBorders).val).toHaveProperty('error');
+      const invalidFgFill = styles.setSolidFg(color)(validCell);
+      expect(validateCell(invalidFgFill).val).toHaveProperty('error');
+      const invalidBgFill = styles.setSolidBg(color)(validCell);
+      expect(validateCell(invalidBgFill).val).toHaveProperty('error');
     });
     ['FF5D8AA8', 'FFFFFFFF', '01234567'].forEach((color) => {
-      const validColor = styles.setFontColor(color)(validCell);
-      expect(validateCell(validColor).val).toHaveProperty('value');
+      const validFont = styles.setFontColor(color)(validCell);
+      expect(validateCell(validFont).val).toHaveProperty('value');
+      const border = styles.toBorder('thin', color);
+      const validBorders = styles.setAllBorders(border)(validCell);
+      expect(validateCell(validBorders).val).toHaveProperty('value');
+      const validFgFill = styles.setSolidFg(color)(validCell);
+      expect(validateCell(validFgFill).val).toHaveProperty('value');
+      const validBgFill = styles.setSolidBg(color)(validCell);
+      expect(validateCell(validBgFill).val).toHaveProperty('value');
     });
+
+    const validFill: t.Fill = {
+      type: 'gradient',
+      gradient: 'angle',
+      degree: 10,
+      stops: [],
+    };
+    const validFillCell = { ...validCell, style: { fill: validFill } };
+    expect(validateCell(validFillCell).val).toHaveProperty('value');
   });
 
   it('validateCell should work', () => {
