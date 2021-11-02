@@ -14,8 +14,6 @@ export interface Coord {
   sheet?: string;
 }
 
-export type ValidCoord = Opaque<'ValidCoord', Coord>;
-
 export interface Style extends Partial<ExcelJS.Style> {
   colWidth?: number;
   rowHeight?: number;

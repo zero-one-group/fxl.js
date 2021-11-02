@@ -5,26 +5,46 @@ import * as t from './types';
 const MAX_ROWS = Math.round(1e5);
 const MAX_COLS = Math.round(1e4);
 
-export function validateCoord(coord: t.Coord): Result<t.ValidCoord, t.Error> {
+function toError(key: string, cell: t.Cell): Err<t.Error> {
+  const prettyCell = JSON.stringify(cell, null, 2);
+  return Err({ error: `invalid ${key} in ${prettyCell}` });
+}
+
+export function validateCoord(cell: t.Cell): Result<t.Cell, t.Error> {
   if (
-    coord.row >= 0 &&
-    coord.row <= MAX_ROWS &&
-    coord.col >= 0 &&
-    coord.col <= MAX_COLS
+    cell.coord.row >= 0 &&
+    cell.coord.row <= MAX_ROWS &&
+    cell.coord.col >= 0 &&
+    cell.coord.col <= MAX_COLS
   ) {
-    return Ok(coord as t.ValidCoord);
+    return Ok(cell);
   } else {
-    const prettyCoord = JSON.stringify(coord, null, 2);
-    return Err({ error: `invalid coordinate range in ${prettyCoord}` });
+    return toError('coordinate', cell);
+  }
+}
+
+function isValidArgb(maybeHex: string | undefined): boolean {
+  if (maybeHex == undefined) {
+    return true;
+  } else {
+    const lowered = maybeHex.toLowerCase();
+    const parsed = parseInt(lowered, 16).toString(16).padStart(8, '0');
+    return parsed === lowered && maybeHex.length == 8;
+  }
+}
+
+export function validateFontColor(cell: t.Cell): Result<t.Cell, t.Error> {
+  const argb = cell.style?.font?.color?.argb;
+  if (isValidArgb(argb)) {
+    return Ok(cell);
+  } else {
+    return toError('font color', cell);
   }
 }
 
 export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
-  const errors = [];
-  const validated = validateCoord(cell.coord);
-  if (validated.err) {
-    errors.push(validated.val);
-  }
+  const validationResults = [validateCoord(cell), validateFontColor(cell)];
+  const [, errors] = splitErrors(validationResults);
   if (errors.length == 0) {
     return Ok(cell as t.ValidCell);
   } else {
