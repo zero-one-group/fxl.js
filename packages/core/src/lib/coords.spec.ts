@@ -1,5 +1,4 @@
 import * as coords from './coords';
-import * as core from './core';
 
 describe('basic coordinate helper functions', () => {
   const table = coords.tableToCells([
