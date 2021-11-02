@@ -191,3 +191,21 @@ export function setFontColor(fontColor: string): t.Monoid<t.Cell> {
     return setFont(font)(cell);
   };
 }
+
+// ---------------------------------------------------------------------------
+// Cell Sizes
+// ---------------------------------------------------------------------------
+
+export function setColWidth(colWidth: number): fxl.Monoid<fxl.Cell> {
+  return (cell: fxl.Cell) => {
+    const style = { ...cell.style, colWidth: colWidth };
+    return { ...cell, style: style };
+  };
+}
+
+export function setRowHeight(rowHeight: number): fxl.Monoid<fxl.Cell> {
+  return (cell: fxl.Cell) => {
+    const style = { ...cell.style, rowHeight: rowHeight };
+    return { ...cell, style: style };
+  };
+}

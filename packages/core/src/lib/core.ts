@@ -101,21 +101,53 @@ function setCells(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
 }
 
 function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
-  // TODO
-  const colWidths: t.CellSizes = {};
-  const rowHeights: t.CellSizes = {};
+  const colWidths: t.CellSizes = new Map();
+  const rowHeights: t.CellSizes = new Map();
+  cells.forEach((cell) => {
+    const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
+    const { row: row, col: col } = cell.coord;
+    const colWidth = cell?.style?.colWidth;
+    if (colWidth) {
+      const sheetColWidths = colWidths.get(sheetName) || new Map();
+      const thisColWidths = sheetColWidths.get(col) || [];
+      thisColWidths.push(colWidth);
+      sheetColWidths.set(col, thisColWidths);
+      colWidths.set(sheetName, sheetColWidths);
+    }
+    const rowHeight = cell?.style?.rowHeight;
+    if (rowHeight) {
+      const sheetRowHeights = rowHeights.get(sheetName) || new Map();
+      const thisRowHeights = sheetRowHeights.get(row) || [];
+      thisRowHeights.push(rowHeight);
+      sheetRowHeights.set(col, thisRowHeights);
+      rowHeights.set(sheetName, sheetRowHeights);
+    }
+  });
   return [colWidths, rowHeights];
 }
 
-function setCellSizes(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {}
+function setCellSizes(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
+  const [colWidths, rowHeights] = scanCellSizes(cells);
+  for (const [sheetName, sheetColWidths] of colWidths.entries()) {
+    const worksheet = workbook.getWorksheet(sheetName);
+    for (const [colIndex, thisColWidths] of sheetColWidths.entries()) {
+      worksheet.columns[colIndex]['width'] = Math.max(...thisColWidths);
+    }
+  }
+  for (const [sheetName, sheetRowHeights] of rowHeights.entries()) {
+    const worksheet = workbook.getWorksheet(sheetName);
+    for (const [rowIndex, thisRowHeights] of sheetRowHeights.entries()) {
+      worksheet.getRow(rowIndex).height = Math.max(...thisRowHeights);
+    }
+  }
+}
 
 function toExcelWorkbook(cells: t.Cell[]): Result<ExcelJS.Workbook, t.Error> {
   const [validCells, errors] = splitErrors(cells.map(validateCell));
   if (errors.length == 0) {
     const workbook = new ExcelJS.Workbook();
-    setCells(workbook, validCells);
-    // TODO: setCellSizes(worbook, validCells)
-    //console.log(cellSizes)
+    setCells(workbook, validCells); // TODO: return scan results here
+    setCellSizes(workbook, validCells);
     return Ok(workbook);
   } else {
     return Err(concatErrors(errors));
