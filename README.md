@@ -4,7 +4,7 @@
 
 _fxl.js_ (_/ˈfɪk.səl/_ or "pixel" with an f) is a **data-oriented** JavaScript spreadsheet library built on top of [ExcelJS](https://github.com/exceljs/exceljs). The library focuses on **composability**, and aims to provide a way to build spreadsheets using modular, lego-like blocks. Its primary use case is for building spreadsheets based on human-designed templates that are not tabular.
 
-_fxl.js_ is an adaptation of the original Clojure library [fxl]('https://github.com/zero-one-group/fxl').
+_fxl.js_ is a JavaScript adaptation of the original Clojure library [fxl](https://github.com/zero-one-group/fxl).
 
 # Contents
 
@@ -14,7 +14,7 @@ _fxl.js_ is an adaptation of the original Clojure library [fxl]('https://github.
   <li><a href="#examples">Examples</a></li>
     <ul>
       <li><a href="#cells-as-plain-data">Cells as Plain Data</a></li>
-      <li><a href="#creating-a-spreadsheet">Creating a Spreadsheet</a></li>
+      <li><a href="#creating-a-spreadsheet-the-wrong-way">Creating a Spreadsheet (The Wrong Way)</a></li>
       <li><a href="#loading-a-spreadsheet">Loading a Spreadsheet</a></li>
       <li><a href="#coordinate-shortcuts">Coordinate Shortcuts</a></li>
       <li><a href="#style-shortcuts">Style Shortcuts</a></li>
@@ -43,15 +43,226 @@ _fxl.js_ is not built with performance in mind. It is built on top of ExcelJS, w
 
 ## Cells as Plain Data
 
-## Creating a Spreadsheet
+A _fxl.js_ cell is an object with three properties, namely value, coordinate and optionally style. The following are valid cells:
+
+```typescript
+{ value: 'abc', coord: { row: 0, col: 0 } }
+
+{
+  value: 1.23,
+  coord: { row: 2, col: 3, sheet: 'Sheet 1' },
+  style: {
+    numFmt: '0.00%',
+    border: {
+      right: { style: 'medium', color: { argb: 'FF00FF00' } },
+      left: { style: 'medium', color: { argb: 'FF00FF00' } },
+    },
+    font: { name: 'Roboto', size: 16, bold: true },
+  },
+}
+```
+
+By understanding the `fxl.Cell` interface, you are very close to being very productive with _fxl.js_! The rest of the library is composed of IO functions (such as `fxl.readXlsx` and `fxl.writeXlsx`) and shortcut functions that make life very easy when massaging the cell objects.
+
+To find out more about _fxl.js_' cell interface, see [the interface declaration](packages/core/src/lib/types.ts) and [ExcelJS' cell value and style](https://github.com/exceljs/exceljs/blob/master/index.d.ts).
+
+
+## Creating a Spreadsheet (The Wrong Way)
+
+Let's suppose that we would like to create a plain spreadsheet such as the following:
+
+```
+| Item     | Cost     |
+| -------- | -------- |
+| Rent     | 1000     |
+| Gas      | 100      |
+| Food     | 300      |
+| Gym      | 50       |
+| Total    | 1450     |
+```
+
+from an existing JavaScript array of objects such as the following:
+
+```typescript
+const costs = [
+  { item: "Rent", cost: 1000 },
+  { item: "Gas", cost: 100 },
+  { item: "Food", cost: 300 },
+  { item: "Gym", cost: 50 },
+];
+```
+
+We would break the spreadsheet down into three components, namely the header, the body and the total. The following is not the prettiest piece of code (and not the recommended way of using _fxl.js_), but it would work:
+
+```typescript
+const headerCells = [
+  { value: 'Item', coord: { row: 0, col: 0 } },
+  { value: 'Cost', coord: { row: 0, col: 1 } },
+];
+
+const bodyCells = costs.flatMap((record, index) => {
+  return [
+    { value: record.item, coord: { row: index + 1, col: 0 } },
+    { value: record.cost, coord: { row: index + 1, col: 1 } },
+  ];
+});
+
+const totalCells = [
+  { value: 'Total', coord: { row: costs.length + 2, col: 0 } },
+  {
+    value: costs.map((x) => x.cost).reduce((x, y) => x + y),
+    coord: { row: costs.length + 2, col: 1 },
+  },
+];
+```
+
+We then concatenate them, and ask _fxl.js_ to write the cells into an XLSX file:
+
+```typescript
+import * as fxl from '@zog/fxl.js';
+
+const allCells = headerCells.concat(bodyCells).concat(totalCells);
+await fxl.writeXlsx(allCells, 'costs.xlsx')
+```
+
+The above summarises the essence of spreadsheet building with _fxl.js_. It is about taking a piece of data, transform it into the cell objects before finally calling an IO function.
 
 ## Loading a Spreadsheet
 
+```typescript
+const cells = await fxl.readXlsx('costs.xlsx')
+```
+
 ## Coordinate Shortcuts
+
+An important part of _fxl.js_ is the collection of shortcut functions that makes it easy to create the cell objects. We can boil down the above example to the following:
+
+```typescript
+import * as fxl from '@zog/fxl.js';
+
+const costs = [
+  { item: "Rent", cost: 1000 },
+  { item: "Gas", cost: 100 },
+  { item: "Food", cost: 300 },
+  { item: "Gym", cost: 50 },
+];
+const totalCost = costs.map((x) => x.cost).reduce((x, y) => x + y);
+
+const headerCells = fxl.rowToCells(["Item", "Cost"]);
+const bodyCells = fxl.recordsToCells(["item", "cost"], costs);
+const totalCells = fxl.rowToCells(["Total", totalCost]);
+const allCells = fxl.concatBelow(headerCells, bodyCells, totalCells);
+
+await fxl.writeXlsx(allCells, 'costs.xlsx')
+```
+
+_fxl.js_ provides shortcuts for creating rows, cells and tables from plain values (such as `fxl.rowToCells`, `fxl.colToCells`, `fxl.tableToCells` and `fxl.recordToCells`), as well as shortcuts for combining groups of cells together (such as `fxl.concatRight` and `fxl.concatBelow`). This allows us to break down a big spreadsheet into very small components, and only to put them together later at a higher level of abstraction.
 
 ## Style Shortcuts
 
+Let's suppose that we would like to style our simple spreadsheet as follows:
+* The header row's font should be bold with a light gray background.
+* The footer row should be the same as the header row, but with a dark red font colour.
+* The item column of the body should be in italic.
+* All cells should be horizontally aligned center.
+
+In this case, we would take each bullet point into its own function, and apply it to the right cell components:
+
+```typescript
+function setHeaderStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, fxl.setBold(true), fxl.setSolidFg('light_gray'));
+}
+
+function setTotalStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, setHeaderStyle, fxl.setFontColor('dark_red'));
+}
+
+function setBodyStyle(cell: fxl.Cell): fxl.Cell {
+  if (cell.coord.col == 0) {
+    return fxl.setItalic(true)(cell);
+  } else {
+    return cell;
+  }
+}
+
+const allCells = fxl
+  .concatBelow(
+    headerCells.map(setHeaderStyle),
+    bodyCells.map(setBodyStyle),
+    totalCells.map(setTotalStyle)
+  )
+  .map(fxl.setHorizontalAlignement('center'));
+```
+
+Notice that _fxl.js_ comes with a few handy higher-order functions in order to facilitate function compositions, such as `fxl.pipe` and `fxl.compose`.
+
 ## Putting Things Together
+
+Putting our running example together, we start to see a common pattern when building spreadsheets with _fxl.js_, namely:
+
+1. prepare the **data** to be used as cell values;
+2. build small **spreadsheet components** with those values;
+3. prepare the **styles** of each component;
+4. put together the styled components in their **relative coordinates**; and
+5. finally executing the **IO** operation.
+
+```typescript
+import * as fxl from '@zog/fxl.js';
+
+// ------------------------------------------------------------------
+// data
+// ------------------------------------------------------------------
+const costs = [
+  { item: "Rent", cost: 1000 },
+  { item: "Gas", cost: 100 },
+  { item: "Food", cost: 300 },
+  { item: "Gym", cost: 50 },
+];
+const totalCost = costs.map((x) => x.cost).reduce((x, y) => x + y);
+
+// ------------------------------------------------------------------
+// spreadsheet components
+// ------------------------------------------------------------------
+const headerCells = fxl.rowToCells(["Item", "Cost"]);
+const bodyCells = fxl.recordsToCells(["item", "cost"], costs);
+const totalCells = fxl.rowToCells(["Total", totalCost]);
+const allCells = fxl.concatBelow(headerCells, bodyCells, totalCells);
+
+// ------------------------------------------------------------------
+// styles
+// ------------------------------------------------------------------
+function setHeaderStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, fxl.setBold(true), fxl.setSolidFg('light_gray'));
+}
+
+function setTotalStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, setHeaderStyle, fxl.setFontColor('dark_red'));
+}
+
+function setBodyStyle(cell: fxl.Cell): fxl.Cell {
+  if (cell.coord.col == 0) {
+    return fxl.setItalic(true)(cell);
+  } else {
+    return cell;
+  }
+}
+
+// ------------------------------------------------------------------
+// relative coordinates
+// ------------------------------------------------------------------
+const allCells = fxl
+  .concatBelow(
+    headerCells.map(setHeaderStyle),
+    bodyCells.map(setBodyStyle),
+    totalCells.map(setTotalStyle)
+  )
+  .map(fxl.setHorizontalAlignement('center'));
+
+// ------------------------------------------------------------------
+// IO
+// ------------------------------------------------------------------
+await fxl.writeXlsx(allCells, 'costs.xlsx')
+```
 
 See also the [inventory-spreadsheet walkthrough](docs/walkthrough.md) and its [accompanying script](packages/example/src/main.ts) for a more detailed example based on a real use case.
 
