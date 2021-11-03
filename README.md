@@ -209,7 +209,9 @@ Putting our running example together, we start to see a common pattern when buil
 ```typescript
 import * as fxl from '@zog/fxl.js';
 
-\\ data
+// ------------------------------------------------------------------
+// data
+// ------------------------------------------------------------------
 const costs = [
   { item: "Rent", cost: 1000 },
   { item: "Gas", cost: 100 },
@@ -218,13 +220,17 @@ const costs = [
 ];
 const totalCost = costs.map((x) => x.cost).reduce((x, y) => x + y);
 
-\\ spreadsheet components
+// ------------------------------------------------------------------
+// spreadsheet components
+// ------------------------------------------------------------------
 const headerCells = fxl.rowToCells(["Item", "Cost"]);
 const bodyCells = fxl.recordsToCells(["item", "cost"], costs);
 const totalCells = fxl.rowToCells(["Total", totalCost]);
 const allCells = fxl.concatBelow(headerCells, bodyCells, totalCells);
 
-\\ styles
+// ------------------------------------------------------------------
+// styles
+// ------------------------------------------------------------------
 function setHeaderStyle(cell: fxl.Cell): fxl.Cell {
   return fxl.pipe(cell, fxl.setBold(true), fxl.setSolidFg('light_gray'));
 }
@@ -241,7 +247,9 @@ function setBodyStyle(cell: fxl.Cell): fxl.Cell {
   }
 }
 
-\\ relative coordinates
+// ------------------------------------------------------------------
+// relative coordinates
+// ------------------------------------------------------------------
 const allCells = fxl
   .concatBelow(
     headerCells.map(setHeaderStyle),
@@ -250,7 +258,9 @@ const allCells = fxl
   )
   .map(fxl.setHorizontalAlignement('center'));
 
-\\ IO
+// ------------------------------------------------------------------
+// IO
+// ------------------------------------------------------------------
 await fxl.writeXlsx(allCells, 'costs.xlsx')
 ```
 
