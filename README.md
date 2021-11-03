@@ -34,9 +34,12 @@ _fxl.js_ has not been released yet.
 # Why _fxl.js_?
 
 There are three things that _fxl.js_ tries to do differently compared to other JavaScript spreadsheet libraries, namely:
+
 1. **immutability:** the entire API requires no side effects or mutations except for the IO operations at the very start or end for reading and writing the spreadsheets respectively. With _fxl.js_, it is more ergonomic to work with data and pure functions until near the end of the application, where all the side effects are isolated and happen in one go - see [Functional Core, Imperative Shell](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell).
-2. **data orientation**; and
-3. **cells as unordered collections of objects**.
+2. **data orientation:** the data model is represented as plain, nested JavaScript objects with literal child nodes. This allows us to reuse common JavaScript functions/methods to manipulate objects, and easily integrate _fxl.js_ with functional utility libraries such as [Lodash](https://lodash.com/) and [Ramda](https://ramdajs.com/) - see [Alan Perlis' Epigram on common functions](https://stackoverflow.com/questions/6016271/why-is-it-better-to-have-100-functions-operate-on-one-data-structure-than-10-fun).
+3. **cells as unordered collections of objects:** by expressing value, coordinate and style as three separate, orthogonal properties, we can work on the three components that make up spreadsheet separately. We can deal with interactions of the components only when we put them together. Expressing columns and rows as ordered sequences introduces complexity - see [Rich Hickey's take on the list-and-order problem](https://youtu.be/rI8tNMsozo0?t=1446).
+
+_fxl.js_ is not built with performance in mind. It is built on top of ExcelJS, which thus sets the performance limit for the library. _fxl.js_ shines at building spreadsheets based on human-designed templates, which typically do not translate well to tabular formats such as CSVs, records or nested lists.
 
 # Examples
 
