@@ -200,6 +200,15 @@ const allCells = fxl.concatBelow(
   )
 );
 
-fxl.writeXlsx(allCells.map(setAutoColWidth), 'inventory-report.xlsx');
+async function main() {
+  await fxl.writeXlsx(allCells.map(setAutoColWidth), 'inventory-report.xlsx');
+  console.log(`Wrote to inventory-report.xlsx!\n${new Date()}`);
+  const loadedCells = await fxl.readXlsx('inventory-report.xlsx');
+  if (loadedCells.ok) {
+    const numCells = loadedCells.val.length;
+    console.log(`Read ${numCells} cells from inventory-report.xlsx!`);
+    console.log('__________________________________________________');
+  }
+}
 
-console.log(`Wrote to inventory-report.xlsx!\n${new Date()}\n__________`);
+main();
