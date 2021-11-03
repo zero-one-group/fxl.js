@@ -4,7 +4,7 @@
 
 _fxl.js_ (_/ˈfɪk.səl/_ or "pixel" with an f) is a **data-oriented** JavaScript spreadsheet library built on top of [ExcelJS](https://github.com/exceljs/exceljs). The library focuses on **composability**, and aims to provide a way to build spreadsheets using modular, lego-like blocks. Its primary use case is for building spreadsheets based on human-designed templates that are not tabular.
 
-_fxl.js_ is an adaptation of the original Clojure library [fxl]('https://github.com/zero-one-group/fxl').
+_fxl.js_ is a JavaScript adaptation of the original Clojure library [fxl](https://github.com/zero-one-group/fxl).
 
 # Contents
 
@@ -43,7 +43,94 @@ _fxl.js_ is not built with performance in mind. It is built on top of ExcelJS, w
 
 ## Cells as Plain Data
 
+A _fxl.js_ cell is an object with three properties, namely value, coordinate and optionally style. The following are valid cells:
+
+```typescript
+{ value: 'abc', coord: { row: 0, col: 0 } }
+
+{
+  value: 1.23,
+  coord: { row: 2, col: 3, sheet: 'Sheet 1' },
+  style: {
+    numFmt: '0.00%',
+    border: {
+      right: { style: 'medium', color: { argb: 'FF00FF00' } },
+      left: { style: 'medium', color: { argb: 'FF00FF00' } },
+    },
+    font: { name: 'Roboto', size: 16, bold: true },
+  },
+}
+```
+
+By understanding the `fxl.Cell` interface, you are very close to being very productive with _fxl.js_! The rest of the library is composed of IO functions (such as `fxl.readXlsx` and `fxl.writeXlsx`) and shortcut functions that make life very easy when massaging the cell objects.
+
+To find out more about _fxl.js_' cell interface, see [the interface declaration](packages/core/src/lib/types.ts) and [ExcelJS' cell value and style](https://github.com/exceljs/exceljs/blob/master/index.d.ts).
+
+
 ## Creating a Spreadsheet
+
+Let's suppose that we would like to create a plain spreadsheet such as the following:
+
+```
+| Item     | Cost     |
+| -------- | -------- |
+| Rent     | 1000     |
+| Gas      | 100      |
+| Food     | 300      |
+| Gym      | 50       |
+| Total    | 1450     |
+```
+
+from an existing JavaScript array of objects such as the following:
+
+```typescript
+const costs = [
+  { item: "Rent", cost: 1000 },
+  { item: "Gas", cost: 100 },
+  { item: "Food", cost: 300 },
+  { item: "Gym", cost: 50 },
+];
+```
+
+We would break the spreadsheet down into three components, namely the header, the body and the total
+
+```typescript
+const costs = [
+  { item: 'Rent', cost: 1000 },
+  { item: 'Gas', cost: 100 },
+  { item: 'Food', cost: 300 },
+  { item: 'Gym', cost: 50 },
+];
+
+const headerCells = [
+  { value: 'Item', coord: { row: 0, col: 0 } },
+  { value: 'Cost', coord: { row: 0, col: 1 } },
+];
+
+const bodyCells = costs.flatMap((record, index) => {
+  return [
+    { value: record.item, coord: { row: index + 1, col: 0 } },
+    { value: record.cost, coord: { row: index + 1, col: 1 } },
+  ];
+});
+
+const totalCells = [
+  { value: 'Total', coord: { row: costs.length + 2, col: 0 } },
+  {
+    value: costs.map((x) => x.cost).reduce((x, y) => x + y),
+    coord: { row: costs.length + 2, col: 1 },
+  },
+];
+```
+
+We then concatenate them, and ask _fxl.js_ to write the cells into an XLSX file:
+
+```typescript
+import * as fxl from '@zog/fxl.js';
+
+const allCells = headerCells.concat(bodyCells).concat(totalCells);
+await fxl.writeXlsx(allCells, 'costs.xlsx')
+```
 
 ## Loading a Spreadsheet
 
