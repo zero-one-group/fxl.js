@@ -2,7 +2,7 @@
     <img src="https://github.com/zero-one-group/fxl.js/raw/develop/logo/fxl.png" width="375px">
 </p>
 
-_fxl.js_ (_/ˈfɪk.səl/_ or "pixel" with an f) is a **data-oriented** JavaScript spreadsheet library built on top of [ExcelJS](https://github.com/exceljs/exceljs). The library focuses on **composability**, and aims to provide a way to build spreadsheets using modular, lego-like blocks. Its primary use case is for building spreadsheets based on human-designed templates that are not tabular.
+_fxl.js_ (_/ˈfɪk.səl/_ or "pixel" with an f) is a **data-oriented** JavaScript spreadsheet library built on top of [ExcelJS](https://github.com/exceljs/exceljs). The library focuses on **composability**, and aims to provide a way to build spreadsheets using modular, lego-like blocks. Its primary use case is for building spreadsheets based on human-designed templates that are not tabular. 
 
 _fxl.js_ is a JavaScript adaptation of the original Clojure library [fxl](https://github.com/zero-one-group/fxl).
 
@@ -272,6 +272,6 @@ _fxl.js_ is very much a work-in-progress. Whilst it is being used in production 
 
 # License
 
-Copyright 2021 Zero One Group.
+Copyright 2021 Zero One Group. 
 
 _fxl.js_ is licensed under Apache License v2.0. It means that "users can do (nearly) anything they want with the code, with very few exceptions". See [here](https://fossa.com/blog/open-source-licenses-101-apache-license-2-0/) for more information.
