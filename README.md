@@ -2,7 +2,7 @@
     <img src="https://github.com/zero-one-group/fxl.js/raw/develop/logo/fxl.png" width="375px">
 </p>
 
-_fxl.js_ (_/ˈfɪk.səl/_ or "pixel" with an f) is a **data-oriented** JavaScript spreadsheet library built on top of [ExcelJS](https://github.com/exceljs/exceljs). The library focuses on **composability**, and aims to provide a way to build spreadsheets using modular, lego-like blocks. Its primary use case is for building spreadsheets based on human-designed templates that are not tabular. 
+_fxl.js_ (_/ˈfɪk.səl/_ or "pixel" with an f) is a **data-oriented** JavaScript spreadsheet library built on top of [ExcelJS](https://github.com/exceljs/exceljs). The library focuses on **composability**, and aims to provide a way to build spreadsheets using modular, lego-like blocks. Its primary use case is for building spreadsheets based on human-designed templates that are not tabular.
 
 _fxl.js_ is an adaptation of the original Clojure library [fxl]('https://github.com/zero-one-group/fxl').
 
@@ -24,8 +24,6 @@ _fxl.js_ is an adaptation of the original Clojure library [fxl]('https://github.
   <li><a href="#further-resources">Further Resources</a></li>
   <li><a href="#license">License</a></li>
 </ul>
-
-See also the [inventory-spreadsheet walkthrough](docs/walkthrough.md) and its [accompanying script](packages/example/src/main.ts) for a more detailed example based on a real use case.
 
 # Installation
 
@@ -55,7 +53,17 @@ _fxl.js_ is not built with performance in mind. It is built on top of ExcelJS, w
 
 ## Putting Things Together
 
+See also the [inventory-spreadsheet walkthrough](docs/walkthrough.md) and its [accompanying script](packages/example/src/main.ts) for a more detailed example based on a real use case.
+
 # Known Issues
+
+* Column widths and row heights are not persisted after writing the spreadsheet. Loading an existing spreadsheet will contain no information regarding column widths and row heights.
+
+See also [ExcelJS' known issues](https://github.com/exceljs/exceljs#known-issues).
+
+# Contributing
+
+_fxl.js_ is very much a work-in-progress. Whilst it is being used in production at [Zero One Group](www.zero-one-group.com), it may not be stable just yet. We would love your help to make it production ready! Any sort of contributions (issues, pull requests or general feedback) are all very welcomed!
 
 # Further Resources
 
@@ -65,4 +73,4 @@ _fxl.js_ is not built with performance in mind. It is built on top of ExcelJS, w
 
 Copyright 2021 Zero One Group.
 
-fxl is licensed under Apache License v2.0.
+_fxl.js_ is licensed under Apache License v2.0. It means that "users can do (nearly) anything they want with the code, with very few exceptions". See [here](https://fossa.com/blog/open-source-licenses-101-apache-license-2-0/) for more information.
