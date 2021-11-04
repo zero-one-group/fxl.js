@@ -198,7 +198,7 @@ Notice that _fxl.js_ comes with a few handy higher-order functions in order to f
 
 ## Putting Things Together
 
-Putting our running example together, we start to see a common pattern when building spreadsheets with _fxl.js_, namely:
+When we put our running example together, we actually see a relatively common pattern when building spreadsheets with _fxl.js_. In general, when building a spreadsheet using _fxl.js_, we follow a number of high-level steps:
 
 1. prepare the **data** to be used as cell values;
 2. build small **spreadsheet components** with those values;
