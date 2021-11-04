@@ -12,13 +12,13 @@
     <tbody>
         <tr>
             <td align="center">
-                <img src="https://i.imgur.com/PYyW3Dr.png" width="225" />
+                <img src="https://i.imgur.com/PYyW3Dr.png" width="300" />
             </td>
             <td align="center">
-                <img src="https://i.imgur.com/cFYZVSl.png" width="150" />
+                <img src="https://i.imgur.com/cFYZVSl.png" width="200" />
             </td>
             <td align="center">
-                <img src="https://i.imgur.com/SLqJbtH.png" width="150" />
+                <img src="https://i.imgur.com/SLqJbtH.png" width="200" />
             </td>
         </tr>
     </tbody>
