@@ -1,0 +1,26 @@
+## Inventory Spreadsheet Walkthrough
+
+<p align="center"></p>
+<table>
+    <thead>
+        <tr>
+            <th align="center">Spreadsheet Plan</th>
+            <th align="center">Page 1</th>
+            <th align="center">Page 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align="center">
+                <img src="https://i.imgur.com/PYyW3Dr.png" width="225" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/cFYZVSl.png" width="150" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/SLqJbtH.png" width="150" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p></p>
