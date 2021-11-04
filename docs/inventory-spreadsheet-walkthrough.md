@@ -26,6 +26,10 @@ In this document, we will be walking through a simple spreadsheet-building exerc
 
 ## An Inventory-Planning Spreadsheet
 
+Our inventory-planning spreadsheet reports the actualised/projected opening stock, inflows and outflows of all raw materials every month grouped by quarter. The spreadsheet report includes a header form to indicate the template ID along with the context of the report creation and two footer forms to indicate the PICs for creating and checking the report. The header form is automatically filled in, but the footer forms are intentionally left blank for the PICs to fill in by handwriting. The first-quarter figures are actualised, whereas the subsequent quarters are projections. Low and negative projected quantities should be flagged on the report.
+
+The following images illustrate the spreadsheet schematic template and the final spreadsheet:
+
 <p align="center"></p>
 <table>
     <thead>
@@ -51,7 +55,11 @@ In this document, we will be walking through a simple spreadsheet-building exerc
 </table>
 <p></p>
 
-## The Typical _fxl.js_ Flow
+## Working with Components
+
+Building spreadsheets with _fxl.js_ should feel like building structures using lego blocks. We would start by creating individual components that make up the final structure separately before finally putting the structure together at the end. A component that makes up a structure may itself be composed of sub-components that go through a similar recursive process of isolated construction and integration.
+
+A spreadsheet component is a coherent group of cells that can be operated on as a unit - we may move the group around or style them differently, and it remains a coherent unit. For instance, a header of column names and a body of record values can be viewed as two separate components that make up a table. This table is, in turn, a component that makes up a higher-level component, such as a report page.
 
 1. Spreadsheet Components
 	 a. Values
