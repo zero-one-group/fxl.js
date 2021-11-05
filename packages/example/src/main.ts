@@ -233,10 +233,16 @@ async function main() {
     formHeader,
     createFooter,
     checkFooter,
-    inventoryHeader('Q1', ['Jan', 'Feb', 'Mar']),
+    inventoryHeader('Q3', ['Jul', 'Aug', 'Sep']),
     rawMaterialColumn,
-    singleMonthInventory('Jan'),
-    singleQuarterInventory('Q1', ['Jan', 'Feb', 'Mar']),
+    singleMonthInventory('Dec'),
+    singleQuarterInventory('Q3', ['Jul', 'Aug', 'Sep']),
+    fxl.concatBelow(
+      fxl.padBelow(2, singleQuarterInventory('Q1', ['Jan', 'Feb', 'Mar'])),
+      fxl.padBelow(2, singleQuarterInventory('Q2', ['Apr', 'May', 'Jun'])),
+      fxl.padBelow(2, singleQuarterInventory('Q3', ['Jul', 'Aug', 'Sep'])),
+      singleQuarterInventory('Q4', ['Oct', 'Nov', 'Dec'])
+    ),
   ];
   const paddedComponents = individualComponents.map((component) =>
     fxl.padRight(1, component)

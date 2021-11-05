@@ -28,9 +28,9 @@ In this document, we will be walking through a simple spreadsheet-building exerc
 
 Building spreadsheets with _fxl.js_ should feel like building structures using lego blocks. Typically, we would start by creating individual components that make up the final structure separately before finally putting the structure together at the end. A component that makes up a structure may itself be composed of sub-components that go through a similar recursive process of isolated construction and integration.
 
-Much like a lego structure, a _fxl.js_ spreadsheet is composed of a coherent group of cells that make a **spreadsheet component**. A component is coherent because it can typically be operated on as a unit - we may move it around or style them differently, and the group still serves the original purpose. 
+Much like a lego structure, a _fxl.js_ spreadsheet is composed of a coherent group of cells that make a **spreadsheet component**. A component is coherent because it can typically be operated on as a unit - we may move it around or style them differently, and the group still serves the original purpose.
 
-We make a higher-level component through **integrating lower-level components**. For instance, a header of column names and a body of record values can be viewed as two separate components that make up a table. This table may, in turn, be used as a component that makes up an even higher-level component, such as a report page. 
+We make a higher-level component through **integrating lower-level components**. For instance, a header of column names and a body of record values can be viewed as two separate components that make up a table. This table may, in turn, be used as a component that makes up an even higher-level component, such as a report page.
 
 Once we build up the entire spreadsheet through this recursive process of component building, the only thing left to do is to complete the **IO operation** by writing to a file.
 
@@ -129,15 +129,16 @@ const FORM_DATA = {
 ```
 
 ### Component 1: Form Headers
-We start off with one of the simplest component, namely the report header that contains the document template ID and the report creation context.:
 
 <p align="center">
   <img src="https://i.imgur.com/VZ6BhAP.png" width="400" />
 </p>
 
+We start off with a simple component, namely the report header that contains the document template ID and the report creation context.
+
 The component has a tabular format, so we lay out the cell values as a nested array and invoke `fxl.tableToCells` to take care of the relative coordinates.
 
-As for the style, we treat the first label column differently to the second value column. We bake this condition into a holistic styling function, before applying it to every cell in the component. If you are unfamiliar with `fxl.pipe` and the [curried](https://stackoverflow.com/questions/36314/what-is-currying) shortcut functions, see [_fxl.js_ Shortcut Functions](docs/fxljs-shortcut-functions.md).
+As for the style, we treat the first label column differently to the second value column. We bake this condition into a holistic styling function, before applying it to every cell in the component:
 
 ```typescript
 const plainFormHeader = fxl.tableToCells([
@@ -164,8 +165,28 @@ function setFormStyle(cell: fxl.Cell): fxl.Cell {
 
 const formHeader = plainFormHeader.map(setFormStyle);
 ```
+If you are unfamiliar with `fxl.pipe` and the [curried](https://stackoverflow.com/questions/36314/what-is-currying) shortcut functions, see [_fxl.js_ Shortcut Functions](docs/fxljs-shortcut-functions.md).
+
+Now that we're done with this component, we put it to one side, and forget about them until we need to put together the report later.
 
 ### Component 2: Form Footers
+
+<p align="center"></p>
+<table>
+    <tbody>
+        <tr>
+            <td align="left">
+                <img src="https://i.imgur.com/sGJplVS.png" width="275" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/pgANFbE.png" width="275" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p></p>
+
+The form footers are similar to the report header. This time we reuse the styling function `setFormStyle` from before:
 
 ```typescript
 const plainCreateFooter = fxl.tableToCells([
@@ -184,7 +205,15 @@ const checkFooter = plainCheckFooter.map(setFormStyle);
 
 ### Component 3: Inventory Table
 
+The entire inventory table is complex, because it has to present the quantities for each month grouped by quarter, and, in turn, the quantities by quarter must be stacked on top of one another. However, no matter how complex the structure is, we can always break it down into simpler sub-components.
+
 #### Sub-Component 1: Header
+
+<p align="center">
+  <img src="https://i.imgur.com/DkzU4IL.png" width="950" />
+</p>
+
+The header may look complex at first glance, but it turns out that we can hard-code most of the table with the exception of the quarter and the month names. Here, we define a function that produces the table header cells with parameterised quarter and month names:
 
 ```typescript
 function setHeaderStyle(cell: fxl.Cell): fxl.Cell {
@@ -225,11 +254,21 @@ function inventoryHeader(
 
 #### Sub-Component 2: Raw-Material Column
 
+<p align="center">
+	<img src="https://i.imgur.com/SQJbT32.png" width="100" />
+</p>
+
+The raw-material column is a one-liner with the same style  as the table header:
+
 ```typescript
 const rawMaterialColumn = fxl.colToCells(RAW_MATERIALS).map(setHeaderStyle);
 ```
 
 #### Sub-Component 3: Single-Month Inventory
+
+<p align="center">
+	<img src="https://i.imgur.com/fiJPcuO.png" width="200" />
+</p>
 
 ```typescript
 function highlightShortage(cell: fxl.Cell): fxl.Cell {
@@ -262,6 +301,10 @@ function singleMonthInventory(month: string): fxl.Cell[] {
 ```
 
 #### Sub-Integration 1: Single-Quarter Inventory
+
+<p align="center">
+	<img src="https://i.imgur.com/PGWUnmW.jpg" width="700" />
+</p>
 
 ```typescript
 function setInventoryTableStyle(cell: fxl.Cell): fxl.Cell {
@@ -301,6 +344,31 @@ const inventoryTables = fxl.concatBelow(
 ```
 
 ### Integration: Full Report
+
+<p align="center"></p>
+<table>
+    <thead>
+        <tr>
+            <th align="center">Spreadsheet Components</th>
+            <th align="center">Page 1</th>
+            <th align="center">Page 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align="center">
+                <img src="https://i.imgur.com/PYyW3Dr.png" width="400" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/cFYZVSl.png" width="275" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/SLqJbtH.png" width="275" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p></p>
 
 ```typescript
 const unstyledReport = fxl.concatBelow(
