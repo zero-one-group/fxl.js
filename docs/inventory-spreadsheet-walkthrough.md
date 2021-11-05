@@ -101,10 +101,10 @@ Before we start the spreadsheet building process, we first need to prepare the d
 import * as fs from 'fs';
 
 const JSON_PATH = 'packages/example/src/assets/inventory.json';
-const rawData = fs.readFileSync(JSON_PATH).toString();
-const inventory = JSON.parse(rawData);
+const RAW_DATA = fs.readFileSync(JSON_PATH).toString();
+const INVENTORY = JSON.parse(RAW_DATA);
 
-const rawMaterials = [
+const RAW_MATERIALS = [
   'Arrowroot',             'Caffeine',
   'Calciferol',            'Calcium Bromate',
   'Casein',                'Chlorine',
@@ -120,7 +120,7 @@ const rawMaterials = [
   'Vanillin',              'Yellow 2G'
 ]
 
-const formData = {
+const FORM_DATA = {
   docId: 'F-ABC-123',
   revisionNumber: 2,
   site: 'Jakarta',
@@ -129,13 +129,22 @@ const formData = {
 ```
 
 ### Component 1: Form Headers
+We start off with one of the simplest component, namely the report header that contains the document template ID and the report creation context.:
+
+<p align="center">
+  <img src="https://i.imgur.com/VZ6BhAP.png" width="400" />
+</p>
+
+The component has a tabular format, so we lay out the cell values as a nested array and invoke `fxl.tableToCells` to take care of the relative coordinates.
+
+As for the style, we treat the first label column differently to the second value column. We bake this condition into a holistic styling function, before applying it to every cell in the component. If you are unfamiliar with `fxl.pipe` and the [curried](https://stackoverflow.com/questions/36314/what-is-currying) shortcut functions, see [_fxl.js_ Shortcut Functions](docs/fxljs-shortcut-functions.md).
 
 ```typescript
 const plainFormHeader = fxl.tableToCells([
-  ['Document ID:', formData.docId],
-  ['Revision Number:', formData.revisionNumber],
-  ['Site:', formData.site],
-  ['Timestamp', formData.timestamp],
+  ['Document ID:', FORM_DATA.docId],
+  ['Revision Number:', FORM_DATA.revisionNumber],
+  ['Site:', FORM_DATA.site],
+  ['Timestamp', FORM_DATA.timestamp],
 ]);
 
 function setFormStyle(cell: fxl.Cell): fxl.Cell {
@@ -217,7 +226,7 @@ function inventoryHeader(
 #### Sub-Component 2: Raw-Material Column
 
 ```typescript
-const rawMaterialColumn = fxl.colToCells(rawMaterials).map(setHeaderStyle);
+const rawMaterialColumn = fxl.colToCells(RAW_MATERIALS).map(setHeaderStyle);
 ```
 
 #### Sub-Component 3: Single-Month Inventory
@@ -242,8 +251,8 @@ function setInventoryBodyStyle(cell: fxl.Cell): fxl.Cell {
 }
 
 function singleMonthInventory(month: string): fxl.Cell[] {
-  const monthsInventory = inventory[month];
-  const inventoryTable = rawMaterials.map((name) => [
+  const monthsInventory = INVENTORY[month];
+  const inventoryTable = RAW_MATERIALS.map((name) => [
     monthsInventory.opening[name],
     monthsInventory.inflows[name],
     monthsInventory.outflows[name],

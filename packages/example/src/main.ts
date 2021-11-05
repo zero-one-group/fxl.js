@@ -23,23 +23,24 @@ interface Quantities {
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-const JSON_PATH = 'packages/example/src/assets/inventory.json';
-const rawData = fs.readFileSync(JSON_PATH).toString();
-const inventory = JSON.parse(rawData) as InventoryData;
-
 function unique<T>(xs: T[]): T[] {
   return [...new Set(xs)].sort();
 }
 
 const values = Object.values;
 const keys = Object.keys;
-const rawMaterials = unique(
-  values(inventory).flatMap((monthsInventory) =>
+
+const JSON_PATH = 'packages/example/src/assets/inventory.json';
+const RAW_DATA = fs.readFileSync(JSON_PATH).toString();
+const INVENTORY = JSON.parse(RAW_DATA) as InventoryData;
+
+const RAW_MATERIALS = unique(
+  values(INVENTORY).flatMap((monthsInventory) =>
     values(monthsInventory).flatMap(keys)
   )
 );
 
-const formData = {
+const FORM_DATA = {
   docId: 'F-ABC-123',
   revisionNumber: 2,
   site: 'Jakarta',
@@ -50,10 +51,10 @@ const formData = {
 // Component 1: Form Headers
 // ---------------------------------------------------------------------------
 const plainFormHeader = fxl.tableToCells([
-  ['Document ID:', formData.docId],
-  ['Revision Number:', formData.revisionNumber],
-  ['Site:', formData.site],
-  ['Timestamp', formData.timestamp],
+  ['Document ID:', FORM_DATA.docId],
+  ['Revision Number:', FORM_DATA.revisionNumber],
+  ['Site:', FORM_DATA.site],
+  ['Timestamp:', FORM_DATA.timestamp],
 ]);
 
 function setFormStyle(cell: fxl.Cell): fxl.Cell {
@@ -130,7 +131,7 @@ function inventoryHeader(
 }
 
 // Sub-Component 2: Raw-Material Column
-const rawMaterialColumn = fxl.colToCells(rawMaterials).map(setHeaderStyle);
+const rawMaterialColumn = fxl.colToCells(RAW_MATERIALS).map(setHeaderStyle);
 
 // Sub-Component 3: Single-Month Inventory
 function highlightShortage(cell: fxl.Cell): fxl.Cell {
@@ -152,8 +153,8 @@ function setInventoryBodyStyle(cell: fxl.Cell): fxl.Cell {
 }
 
 function singleMonthInventory(month: string): fxl.Cell[] {
-  const monthsInventory = inventory[month];
-  const inventoryTable = rawMaterials.map((name) => [
+  const monthsInventory = INVENTORY[month];
+  const inventoryTable = RAW_MATERIALS.map((name) => [
     monthsInventory.opening[name],
     monthsInventory.inflows[name],
     monthsInventory.outflows[name],
@@ -220,23 +221,32 @@ const report = unstyledReport.map(setAutoColWidth);
 async function main() {
   await fxl.writeXlsx(report, 'inventory-report.xlsx');
   console.log(`Wrote to inventory-report.xlsx!\n${new Date()}`);
+
   const loadedCells = await fxl.readXlsx('inventory-report.xlsx');
   if (loadedCells.ok) {
     const numCells = loadedCells.val.length;
     console.log(`Read ${numCells} cells from inventory-report.xlsx!`);
     console.log('__________________________________________________');
   }
+
+  const individualComponents = [
+    formHeader,
+    createFooter,
+    checkFooter,
+    inventoryHeader('Q1', ['Jan', 'Feb', 'Mar']),
+    rawMaterialColumn,
+    singleMonthInventory('Jan'),
+    singleQuarterInventory('Q1', ['Jan', 'Feb', 'Mar']),
+  ];
+  const paddedComponents = individualComponents.map((component) =>
+    fxl.padRight(1, component)
+  );
+  await fxl.writeXlsx(
+    fxl.concatRight(...paddedComponents).map(setAutoColWidth),
+    'components.xlsx'
+  );
+  console.log(`Wrote to components.xlsx!\n${new Date()}`);
+  console.log('__________________________________________________');
 }
 
 main();
-
-fxl.writeXlsx(
-  fxl
-    .concatRight(
-      ...[formHeader, createFooter, checkFooter].map((component) =>
-        fxl.padRight(1, component)
-      )
-    )
-    .map(setAutoColWidth),
-  'components.xlsx'
-);
