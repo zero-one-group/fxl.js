@@ -5,9 +5,8 @@ In this document, we will be walking through a simple spreadsheet-building exerc
 # Contents
 
 <ul>
-  <li><a href="#an-inventory-planning-spreadsheet">An Inventory-Planning Spreadsheet</a></li>
-  <li><a href="#why-fxljs">Why <i>fxl.js?</i></a></li>
   <li><a href="#the-typical-fxljs-flow">The Typical <i>fxl.js</i> Flow</a></li>
+  <li><a href="#an-inventory-planning-spreadsheet">An Inventory-Planning Spreadsheet</a></li>
   <li><a href="#component-building">Component Building</a></li>
     <ul>
       <li><a href="#component-1-form-headers">Component 1: Form Headers</a></li>
@@ -17,43 +16,13 @@ In this document, we will be walking through a simple spreadsheet-building exerc
         <li> <a href="#sub-component-1-header">Sub-Component 1: Header</a></li>
         <li> <a href="#sub-component-2-raw-material-column">Sub-Component 2: Raw-Material Column</a></li>
         <li> <a href="#sub-component-3-single-month-inventory">Sub-Component 3: Single-Month Inventory</a></li>
-        <li> <a href="#integration-1-single-quarter-inventory">Integration 1: Single-Quarter Inventory</a></li>
-        <li> <a href="#integration-1-full-year-inventory">Integration 2: Full-Year Inventory</a></li>
+        <li> <a href="#sub-integration-1-single-quarter-inventory">Sub-Integration 1: Single-Quarter Inventory</a></li>
+        <li> <a href="#sub-integration-2-full-year-inventory">Sub-Integration 2: Full-Year Inventory</a></li>
       </ul>
+    <li><a href="#integration-full-report">Integration: Full Report</a></li>
    </ul>
-  <li><a href="#component-integration-writing-to-file">Component Integration + Writing to File</a></li>
+  <li><a href="#writing-to-file">Writing to File</a></li>
 </ul>
-
-## An Inventory-Planning Spreadsheet
-
-Our inventory-planning spreadsheet reports the actualised/projected opening stock, inflows and outflows of all raw materials every month grouped by quarter. The spreadsheet includes a header form to indicate the template ID along with the context of the report creation and two footer forms to indicate the PICs for creating and checking the report. The header form is automatically filled in, but the footer forms are intentionally left blank for the PICs to fill in by handwriting. The first-quarter figures are actualised, whereas the subsequent quarters are projections. Low and negative projected quantities should be flagged and made obvious on the report.
-
-The following images illustrate the spreadsheet schematic template and the final spreadsheet divided into two pages:
-
-<p align="center"></p>
-<table>
-    <thead>
-        <tr>
-            <th align="center">Spreadsheet Components</th>
-            <th align="center">Page 1</th>
-            <th align="center">Page 2</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td align="center">
-                <img src="https://i.imgur.com/PYyW3Dr.png" width="400" />
-            </td>
-            <td align="center">
-                <img src="https://i.imgur.com/cFYZVSl.png" width="275" />
-            </td>
-            <td align="center">
-                <img src="https://i.imgur.com/SLqJbtH.png" width="275" />
-            </td>
-        </tr>
-    </tbody>
-</table>
-<p></p>
 
 ## Working with Components
 
@@ -93,22 +62,258 @@ const report = fxl.concateBelow(fxl.padBelow(2, page), anotherPage);
 await fxl.writeXlsx(report, 'report.xlsx')
 ```
 
+## An Inventory-Planning Spreadsheet
+
+Our inventory-planning spreadsheet reports the actualised/projected opening stock, inflows and outflows of all raw materials every month grouped by quarter. The spreadsheet includes a header form to indicate the template ID along with the context of the report creation and two footer forms to indicate the PICs for creating and checking the report. The header form is automatically filled in, but the footer forms are intentionally left blank for the PICs to fill in by handwriting. The first-quarter figures are actualised, whereas the subsequent quarters are projections. Low and negative projected quantities should be flagged and made obvious on the report.
+
+The following images illustrate the spreadsheet schematic template and the final spreadsheet divided into two pages:
+
+<p align="center"></p>
+<table>
+    <thead>
+        <tr>
+            <th align="center">Spreadsheet Components</th>
+            <th align="center">Page 1</th>
+            <th align="center">Page 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align="center">
+                <img src="https://i.imgur.com/PYyW3Dr.png" width="400" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/cFYZVSl.png" width="275" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/SLqJbtH.png" width="275" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p></p>
+
 ## Component Building
+
+Before we start the spreadsheet building process, we first need to prepare the dataset. Here's a cleaner, hard-coded version of the data preparation:
+
+```typescript
+import * as fs from 'fs';
+
+const JSON_PATH = 'packages/example/src/assets/inventory.json';
+const rawData = fs.readFileSync(JSON_PATH).toString();
+const inventory = JSON.parse(rawData);
+
+const rawMaterials = [
+  'Arrowroot',             'Caffeine',
+  'Calciferol',            'Calcium Bromate',
+  'Casein',                'Chlorine',
+  'Chlorine Dioxide',      'Corn Syrup',
+  'Dipotassium Phosphate', 'Disodium Phosphate',
+  'Edible Bone phosphate', 'Extenders',
+  'Fructose',              'Gelatine',
+  'H. Veg. protein',       'Invert Sugar',
+  'Iodine',                'Lactose',
+  'Niacin/Nicotinic Acid', 'Polysorbate 60',
+  'Potassium Bromate',     'Sodium Chloride/Salt',
+  'Sucrose',               'Thiamine',
+  'Vanillin',              'Yellow 2G'
+]
+
+const formData = {
+  docId: 'F-ABC-123',
+  revisionNumber: 2,
+  site: 'Jakarta',
+  timestamp: 'Fri Nov 05 2021'
+}
+```
 
 ### Component 1: Form Headers
 
+```typescript
+const plainFormHeader = fxl.tableToCells([
+  ['Document ID:', formData.docId],
+  ['Revision Number:', formData.revisionNumber],
+  ['Site:', formData.site],
+  ['Timestamp', formData.timestamp],
+]);
+
+function setFormStyle(cell: fxl.Cell): fxl.Cell {
+  const setBorders = fxl.setAllBorders(fxl.toBorder('medium', 'black'));
+  if (cell.coord.col == 0) {
+    return fxl.pipe(
+      cell,
+      setBorders,
+      fxl.setBold(true),
+      fxl.setHorizontalAlignement('right'),
+      fxl.setSolidFg('light_gray')
+    );
+  } else {
+    return fxl.pipe(cell, setBorders, fxl.setHorizontalAlignement('center'));
+  }
+}
+
+const formHeader = plainFormHeader.map(setFormStyle);
+```
+
 ### Component 2: Form Footers
+
+```typescript
+const plainCreateFooter = fxl.tableToCells([
+  ['Created By:', undefined],
+  ['Date:', undefined],
+]);
+
+const plainCheckFooter = fxl.tableToCells([
+  ['Checked By:', undefined],
+  ['Date:', undefined],
+]);
+
+const createFooter = plainCreateFooter.map(setFormStyle);
+const checkFooter = plainCheckFooter.map(setFormStyle);
+```
 
 ### Component 3: Inventory Table
 
 #### Sub-Component 1: Header
 
+```typescript
+function setHeaderStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, fxl.setBold(true), fxl.setSolidFg('light_gray'));
+}
+
+function inventoryHeader(
+  quarter: string,
+  months: [string, string, string]
+): fxl.Cell[] {
+  const firstRow = fxl.rowToCells([
+    quarter,
+    undefined,
+    months[0],
+    undefined,
+    undefined,
+    months[1],
+    undefined,
+    undefined,
+    months[2],
+    undefined,
+  ]);
+  const secondRow = fxl.rowToCells([
+    'Raw Material',
+    'Opening',
+    'Inflows',
+    'Outflows',
+    'Opening',
+    'Inflows',
+    'Outflows',
+    'Opening',
+    'Inflows',
+    'Outflows',
+  ]);
+  return fxl.concatBelow(firstRow, secondRow).map(setHeaderStyle);
+}
+```
+
 #### Sub-Component 2: Raw-Material Column
+
+```typescript
+const rawMaterialColumn = fxl.colToCells(rawMaterials).map(setHeaderStyle);
+```
 
 #### Sub-Component 3: Single-Month Inventory
 
-#### Integration 1: Single-Quarter Inventory
+```typescript
+function highlightShortage(cell: fxl.Cell): fxl.Cell {
+  if (typeof cell.value == 'number') {
+    if (cell.value > 100) {
+      return cell;
+    } else if (cell.value > 0) {
+      return fxl.setSolidFg('yellow')(cell);
+    } else {
+      return fxl.pipe(cell, fxl.setSolidFg('red'), fxl.setFontColor('white'));
+    }
+  } else {
+    return cell;
+  }
+}
 
-#### Integration 2: Full-Year Inventory
+function setInventoryBodyStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, highlightShortage, fxl.setNumFmt('#,##0'));
+}
 
-## Component Integration + Writing to File
+function singleMonthInventory(month: string): fxl.Cell[] {
+  const monthsInventory = inventory[month];
+  const inventoryTable = rawMaterials.map((name) => [
+    monthsInventory.opening[name],
+    monthsInventory.inflows[name],
+    monthsInventory.outflows[name],
+  ]);
+  return fxl.tableToCells(inventoryTable).map(setInventoryBodyStyle);
+}
+```
+
+#### Sub-Integration 1: Single-Quarter Inventory
+
+```typescript
+function setInventoryTableStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(
+    cell,
+    fxl.setAllBorders(fxl.toBorder('thin', 'black')),
+    fxl.applyIfElse(
+      (x) => x.coord.col == 0 && x.coord.row != 0,
+      fxl.setHorizontalAlignement('right'),
+      fxl.setHorizontalAlignement('center')
+    )
+  );
+}
+
+function singleQuarterInventory(
+  quarter: string,
+  months: [string, string, string]
+): fxl.Cell[] {
+  const singleMonthBodies = months.map(singleMonthInventory);
+  const plain = fxl.concatBelow(
+    inventoryHeader(quarter, months),
+    fxl.concatRight(rawMaterialColumn, ...singleMonthBodies)
+  );
+  return plain.map(setInventoryTableStyle);
+}
+```
+
+#### Sub-Integration 2: Full-Year Inventory
+
+```typescript
+const inventoryTables = fxl.concatBelow(
+  fxl.padBelow(2, singleQuarterInventory('Q1', ['Jan', 'Feb', 'Mar'])),
+  fxl.padBelow(2, singleQuarterInventory('Q2', ['Apr', 'May', 'Jun'])),
+  fxl.padBelow(2, singleQuarterInventory('Q3', ['Jul', 'Aug', 'Sep'])),
+  singleQuarterInventory('Q4', ['Oct', 'Nov', 'Dec'])
+);
+```
+
+### Integration: Full Report
+
+```typescript
+const unstyledReport = fxl.concatBelow(
+  fxl.padBelow(2, formHeader),
+  fxl.padBelow(2, inventoryTables),
+  fxl.concatRight(fxl.padRight(2, createFooter), checkFooter)
+);
+
+function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
+  if (cell.value) {
+    const colWidth = Math.max(cell.value.toString().length, 10);
+    return fxl.setColWidth(colWidth)(cell);
+  } else {
+    return cell;
+  }
+}
+
+const report = unstyledReport.map(setAutoColWidth);
+```
+
+## Writing to File
+
+```typescript
+await fxl.writeXlsx(report, 'inventory-report.xlsx');
+```

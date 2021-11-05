@@ -206,7 +206,7 @@ const unstyledReport = fxl.concatBelow(
 function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
   if (cell.value) {
     const colWidth = Math.max(cell.value.toString().length, 10);
-    return { ...cell, style: { ...cell.style, colWidth: colWidth } };
+    return fxl.setColWidth(colWidth)(cell);
   } else {
     return cell;
   }
