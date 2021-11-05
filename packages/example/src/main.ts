@@ -30,28 +30,34 @@ const inventory = JSON.parse(rawData) as InventoryData;
 function unique<T>(xs: T[]): T[] {
   return [...new Set(xs)].sort();
 }
+
 const values = Object.values;
 const keys = Object.keys;
-
 const rawMaterials = unique(
   values(inventory).flatMap((monthsInventory) =>
-    values(monthsInventory).flatMap((quantities) => keys(quantities))
+    values(monthsInventory).flatMap(keys)
   )
 );
-const timestamp = new Date().toDateString();
+
 const formData = {
   docId: 'F-ABC-123',
   revisionNumber: 2,
   site: 'Jakarta',
-  timestamp: timestamp,
+  timestamp: new Date().toDateString(),
 };
 
 // ---------------------------------------------------------------------------
-// Styles
+// Component 1: Form Headers
 // ---------------------------------------------------------------------------
+const plainFormHeader = fxl.tableToCells([
+  ['Document ID:', formData.docId],
+  ['Revision Number:', formData.revisionNumber],
+  ['Site:', formData.site],
+  ['Timestamp', formData.timestamp],
+]);
+
 function setFormStyle(cell: fxl.Cell): fxl.Cell {
-  const border = fxl.toBorder('medium', 'black');
-  const setBorders = fxl.setAllBorders(border);
+  const setBorders = fxl.setAllBorders(fxl.toBorder('medium', 'black'));
   if (cell.coord.col == 0) {
     return fxl.pipe(
       cell,
@@ -65,71 +71,34 @@ function setFormStyle(cell: fxl.Cell): fxl.Cell {
   }
 }
 
-function highlightShortage(cell: fxl.Cell): fxl.Cell {
-  if (typeof cell.value == 'number') {
-    if (cell.value > 100) {
-      return cell;
-    } else if (cell.value > 0) {
-      return fxl.setSolidFg('yellow')(cell);
-    } else {
-      return fxl.pipe(cell, fxl.setSolidFg('red'), fxl.setFontColor('white'));
-    }
-  } else {
-    return cell;
-  }
-}
-
-function setInventoryStyle(cell: fxl.Cell): fxl.Cell {
-  return fxl.pipe(
-    cell,
-    highlightShortage,
-    fxl.setHorizontalAlignement('center'),
-    fxl.setAllBorders(fxl.toBorder('thin', 'black')),
-    fxl.applyIf(
-      (cell) => cell.coord.row != 0 && cell.coord.col != 0,
-      fxl.setNumFmt('#,##0')
-    ),
-    fxl.applyIf(
-      (cell) => cell.coord.row <= 1 || cell.coord.col == 0,
-      fxl.compose(fxl.setBold(true), fxl.setSolidFg('light_gray'))
-    ),
-    fxl.applyIf(
-      (cell) => cell.coord.row != 0 && cell.coord.col == 0,
-      fxl.setHorizontalAlignement('right')
-    )
-  );
-}
-
-function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
-  if (cell.value) {
-    const colWidth = Math.max(cell.value.toString().length, 10);
-    return { ...cell, style: { ...cell.style, colWidth: colWidth } };
-  } else {
-    return cell;
-  }
-}
+const formHeader = plainFormHeader.map(setFormStyle);
 
 // ---------------------------------------------------------------------------
-// Cells
+// Component 2: Form Footers
 // ---------------------------------------------------------------------------
-const formHeaderCells = fxl.tableToCells([
-  ['Document ID:', formData.docId],
-  ['Revision Number:', formData.revisionNumber],
-  ['Site:', formData.site],
-  ['Timestamp', formData.timestamp],
-]);
-
-const createFooterCells = fxl.tableToCells([
+const plainCreateFooter = fxl.tableToCells([
   ['Created By:', undefined],
   ['Date:', undefined],
 ]);
 
-const checkFooterCells = fxl.tableToCells([
+const plainCheckFooter = fxl.tableToCells([
   ['Checked By:', undefined],
   ['Date:', undefined],
 ]);
 
-function inventoryTableHeaderCells(
+const createFooter = plainCreateFooter.map(setFormStyle);
+const checkFooter = plainCheckFooter.map(setFormStyle);
+
+// ---------------------------------------------------------------------------
+// Component 3: Inventory Table
+// ---------------------------------------------------------------------------
+
+// Sub-Component 1: Header
+function setHeaderStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, fxl.setBold(true), fxl.setSolidFg('light_gray'));
+}
+
+function inventoryHeader(
   quarter: string,
   months: [string, string, string]
 ): fxl.Cell[] {
@@ -157,51 +126,99 @@ function inventoryTableHeaderCells(
     'Inflows',
     'Outflows',
   ]);
-  return fxl.concatBelow(firstRow, secondRow);
+  return fxl.concatBelow(firstRow, secondRow).map(setHeaderStyle);
 }
 
-const rawMaterialColumnCells = fxl.colToCells(rawMaterials);
+// Sub-Component 2: Raw-Material Column
+const rawMaterialColumn = fxl.colToCells(rawMaterials).map(setHeaderStyle);
 
-function singleMonthInventoryCells(month: string): fxl.Cell[] {
+// Sub-Component 3: Single-Month Inventory
+function highlightShortage(cell: fxl.Cell): fxl.Cell {
+  if (typeof cell.value == 'number') {
+    if (cell.value > 100) {
+      return cell;
+    } else if (cell.value > 0) {
+      return fxl.setSolidFg('yellow')(cell);
+    } else {
+      return fxl.pipe(cell, fxl.setSolidFg('red'), fxl.setFontColor('white'));
+    }
+  } else {
+    return cell;
+  }
+}
+
+function setInventoryBodyStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(cell, highlightShortage, fxl.setNumFmt('#,##0'));
+}
+
+function singleMonthInventory(month: string): fxl.Cell[] {
   const monthsInventory = inventory[month];
   const inventoryTable = rawMaterials.map((name) => [
     monthsInventory.opening[name],
     monthsInventory.inflows[name],
     monthsInventory.outflows[name],
   ]);
-  return fxl.tableToCells(inventoryTable);
+  return fxl.tableToCells(inventoryTable).map(setInventoryBodyStyle);
 }
 
-function singleQuarterInventoryCells(
+// Integration 1: Single-Quarter Inventory
+function setInventoryTableStyle(cell: fxl.Cell): fxl.Cell {
+  return fxl.pipe(
+    cell,
+    fxl.setAllBorders(fxl.toBorder('thin', 'black')),
+    fxl.applyIfElse(
+      (x) => x.coord.col == 0 && x.coord.row != 0,
+      fxl.setHorizontalAlignement('right'),
+      fxl.setHorizontalAlignement('center')
+    )
+  );
+}
+
+function singleQuarterInventory(
   quarter: string,
   months: [string, string, string]
 ): fxl.Cell[] {
-  const headerCells = inventoryTableHeaderCells(quarter, months);
-  const bodyCells = fxl.concatRight(
-    rawMaterialColumnCells,
-    ...months.map(singleMonthInventoryCells)
+  const singleMonthBodies = months.map(singleMonthInventory);
+  const plain = fxl.concatBelow(
+    inventoryHeader(quarter, months),
+    fxl.concatRight(rawMaterialColumn, ...singleMonthBodies)
   );
-  return fxl.concatBelow(headerCells, bodyCells).map(setInventoryStyle);
+  return plain.map(setInventoryTableStyle);
 }
 
-const inventoryCells = fxl.concatBelow(
-  fxl.padBelow(2, singleQuarterInventoryCells('Q1', ['Jan', 'Feb', 'Mar'])),
-  fxl.padBelow(2, singleQuarterInventoryCells('Q2', ['Apr', 'May', 'Jun'])),
-  fxl.padBelow(2, singleQuarterInventoryCells('Q3', ['Jul', 'Aug', 'Sep'])),
-  singleQuarterInventoryCells('Q4', ['Oct', 'Nov', 'Dec'])
+// Integration 2: Full-Year Inventory
+const inventoryTables = fxl.concatBelow(
+  fxl.padBelow(2, singleQuarterInventory('Q1', ['Jan', 'Feb', 'Mar'])),
+  fxl.padBelow(2, singleQuarterInventory('Q2', ['Apr', 'May', 'Jun'])),
+  fxl.padBelow(2, singleQuarterInventory('Q3', ['Jul', 'Aug', 'Sep'])),
+  singleQuarterInventory('Q4', ['Oct', 'Nov', 'Dec'])
 );
 
-const allCells = fxl.concatBelow(
-  fxl.padBelow(2, formHeaderCells.map(setFormStyle)),
-  fxl.padBelow(2, inventoryCells),
-  fxl.concatRight(
-    fxl.padRight(2, createFooterCells.map(setFormStyle)),
-    checkFooterCells.map(setFormStyle)
-  )
+// ---------------------------------------------------------------------------
+// Integration: Full Report
+// ---------------------------------------------------------------------------
+const unstyledReport = fxl.concatBelow(
+  fxl.padBelow(2, formHeader),
+  fxl.padBelow(2, inventoryTables),
+  fxl.concatRight(fxl.padRight(2, createFooter), checkFooter)
 );
 
+function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
+  if (cell.value) {
+    const colWidth = Math.max(cell.value.toString().length, 10);
+    return { ...cell, style: { ...cell.style, colWidth: colWidth } };
+  } else {
+    return cell;
+  }
+}
+
+const report = unstyledReport.map(setAutoColWidth);
+
+// ---------------------------------------------------------------------------
+// Integration: Full Report
+// ---------------------------------------------------------------------------
 async function main() {
-  await fxl.writeXlsx(allCells.map(setAutoColWidth), 'inventory-report.xlsx');
+  await fxl.writeXlsx(report, 'inventory-report.xlsx');
   console.log(`Wrote to inventory-report.xlsx!\n${new Date()}`);
   const loadedCells = await fxl.readXlsx('inventory-report.xlsx');
   if (loadedCells.ok) {
@@ -212,3 +229,14 @@ async function main() {
 }
 
 main();
+
+fxl.writeXlsx(
+  fxl
+    .concatRight(
+      ...[formHeader, createFooter, checkFooter].map((component) =>
+        fxl.padRight(1, component)
+      )
+    )
+    .map(setAutoColWidth),
+  'components.xlsx'
+);
