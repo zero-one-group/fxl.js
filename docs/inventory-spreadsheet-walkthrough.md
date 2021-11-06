@@ -64,34 +64,10 @@ await fxl.writeXlsx(report, 'report.xlsx')
 
 ## An Inventory-Planning Spreadsheet
 
-Our inventory-planning spreadsheet reports the actualised/projected opening stock, inflows and outflows of all raw materials every month grouped by quarter. The spreadsheet includes a header form to indicate the template ID along with the context of the report creation and two footer forms to indicate the PICs for creating and checking the report. The header form is automatically filled in, but the footer forms are intentionally left blank for the PICs to fill in by handwriting. The first-quarter figures are actualised, whereas the subsequent quarters are projections. Low and negative projected quantities should be flagged and made obvious on the report.
+<img src="https://i.imgur.com/PYyW3Dr.png" align="right" width="275"/>
+Our inventory-planning spreadsheet reports the actualised/projected opening stock, inflows and outflows of all raw materials every month grouped by quarter. The spreadsheet includes a header form to indicate the template ID along with the context of the report creation and two footer forms to indicate the PICs for creating and checking the report. The header form is automatically filled in, but the footer forms are intentionally left blank for the PICs to fill in by handwriting. The first-quarter figures are actualised, whereas the subsequent quarters are projections. Low and negative projected quantities should be flagged and made obvious on the report. The image above illustrates the schematic template of the spreadsheet.
 
-The following images illustrate the spreadsheet schematic template and the final spreadsheet divided into two pages:
-
-<p align="center"></p>
-<table>
-    <thead>
-        <tr>
-            <th align="center">Spreadsheet Components</th>
-            <th align="center">Page 1</th>
-            <th align="center">Page 2</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td align="center">
-                <img src="https://i.imgur.com/PYyW3Dr.png" width="400" />
-            </td>
-            <td align="center">
-                <img src="https://i.imgur.com/cFYZVSl.png" width="275" />
-            </td>
-            <td align="center">
-                <img src="https://i.imgur.com/SLqJbtH.png" width="275" />
-            </td>
-        </tr>
-    </tbody>
-</table>
-<p></p>
+<br clear="right"/>
 
 ## Component Building
 
@@ -130,15 +106,14 @@ const FORM_DATA = {
 
 ### Component 1: Form Headers
 
-<p align="center">
-  <img src="https://i.imgur.com/VZ6BhAP.png" width="400" />
-</p>
-
+<img src="https://i.imgur.com/VZ6BhAP.png" align="right" width="400"/>
 We start off with a simple component, namely the report header that contains the document template ID and the report creation context.
 
 The component has a tabular format, so we lay out the cell values as a nested array and invoke `fxl.tableToCells` to take care of the relative coordinates.
 
 As for the style, we treat the first label column differently to the second value column. We bake this condition into a holistic styling function, before applying it to every cell in the component:
+
+<br clear="right"/>
 
 ```typescript
 const plainFormHeader = fxl.tableToCells([
@@ -171,6 +146,7 @@ Now that we're done with this component, we put it to one side, and forget about
 
 ### Component 2: Form Footers
 
+<center>
 <p align="center"></p>
 <table>
     <tbody>
@@ -185,6 +161,7 @@ Now that we're done with this component, we put it to one side, and forget about
     </tbody>
 </table>
 <p></p>
+</center>
 
 The form footers are similar to the report header. This time we reuse the styling function `setFormStyle` from before:
 
@@ -205,7 +182,7 @@ const checkFooter = plainCheckFooter.map(setFormStyle);
 
 ### Component 3: Inventory Table
 
-The entire inventory table is complex, because it has to present the quantities for each month grouped by quarter, and, in turn, the quantities by quarter must be stacked on top of one another. However, no matter how complex the structure is, we can always break it down into simpler sub-components.
+The entire inventory table is complex, because it has to present the quantities for each month grouped by quarter, and, in turn, the quantities by quarter must be stacked on top of one another. Even though the entire structure may be complex, we may still break it down into simpler sub-components.
 
 #### Sub-Component 1: Header
 
@@ -254,10 +231,6 @@ function inventoryHeader(
 
 #### Sub-Component 2: Raw-Material Column
 
-<p align="center">
-	<img src="https://i.imgur.com/SQJbT32.png" width="100" />
-</p>
-
 The raw-material column is a one-liner with the same style  as the table header:
 
 ```typescript
@@ -266,9 +239,7 @@ const rawMaterialColumn = fxl.colToCells(RAW_MATERIALS).map(setHeaderStyle);
 
 #### Sub-Component 3: Single-Month Inventory
 
-<p align="center">
-	<img src="https://i.imgur.com/fiJPcuO.png" width="200" />
-</p>
+The inventory for a single month is, at its core, just a table. However, we would like to flag certain quantities that are running low or are projected to run out with different highlighting. Here, we use a styling function that is conditional upon the value of the cell:
 
 ```typescript
 function highlightShortage(cell: fxl.Cell): fxl.Cell {
@@ -300,11 +271,32 @@ function singleMonthInventory(month: string): fxl.Cell[] {
 }
 ```
 
+<center>
+<table>
+    <thead>
+        <tr>
+            <th align="center">Raw-Material Column</th>
+            <th align="center">Single-Month Inventory</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td align="left">
+                <img src="https://i.imgur.com/SQJbT32.png" height="600" />
+            </td>
+            <td align="center">
+                <img src="https://i.imgur.com/fiJPcuO.png" height="600" />
+            </td>
+        </tr>
+    </tbody>
+</table>
+</p>
+<p></p>
+</center>
+
 #### Sub-Integration 1: Single-Quarter Inventory
 
-<p align="center">
-	<img src="https://i.imgur.com/PGWUnmW.jpg" width="700" />
-</p>
+Integrating our sub-components into a single-quarter inventory involves concatenating the raw-material column with the inventory table body before putting header on top of the combination:
 
 ```typescript
 function setInventoryTableStyle(cell: fxl.Cell): fxl.Cell {
@@ -331,8 +323,13 @@ function singleQuarterInventory(
   return plain.map(setInventoryTableStyle);
 }
 ```
+<p align="center">
+	<img src="https://i.imgur.com/PGWUnmW.jpg" width="700" />
+</p>
 
 #### Sub-Integration 2: Full-Year Inventory
+
+The integration to a component of a full-year inventory is straightforward - we stack each quarter's inventory vertically. We also add two-cell paddings below each quarter's inventory for cosmetics reasons:
 
 ```typescript
 const inventoryTables = fxl.concatBelow(
@@ -344,6 +341,27 @@ const inventoryTables = fxl.concatBelow(
 ```
 
 ### Integration: Full Report
+
+We put all of our components together whilst considering the horizontal and vertical padding for cosmetic reasons. We finally automatically set the column width depending on the value of the cell - the maximum width of each column will be used in the final spreadsheet:
+
+```typescript
+const unstyledReport = fxl.concatBelow(
+  fxl.padBelow(2, formHeader),
+  fxl.padBelow(2, inventoryTables),
+  fxl.concatRight(fxl.padRight(2, createFooter), checkFooter)
+);
+
+function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
+  if (cell.value) {
+    const colWidth = Math.max(cell.value.toString().length, 10);
+    return fxl.setColWidth(colWidth)(cell);
+  } else {
+    return cell;
+  }
+}
+
+const report = unstyledReport.map(setAutoColWidth);
+```
 
 <p align="center"></p>
 <table>
@@ -370,27 +388,14 @@ const inventoryTables = fxl.concatBelow(
 </table>
 <p></p>
 
-```typescript
-const unstyledReport = fxl.concatBelow(
-  fxl.padBelow(2, formHeader),
-  fxl.padBelow(2, inventoryTables),
-  fxl.concatRight(fxl.padRight(2, createFooter), checkFooter)
-);
-
-function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
-  if (cell.value) {
-    const colWidth = Math.max(cell.value.toString().length, 10);
-    return fxl.setColWidth(colWidth)(cell);
-  } else {
-    return cell;
-  }
-}
-
-const report = unstyledReport.map(setAutoColWidth);
-```
 
 ## Writing to File
 
+If we got all the cell objects correct, `fxl.writeXlsx` should return `None`, which is a [_ts-results_ `Option` object](https://github.com/vultix/ts-results#option-example):
+
 ```typescript
-await fxl.writeXlsx(report, 'inventory-report.xlsx');
+const result = await fxl.writeXlsx(report, 'inventory-report.xlsx');
+if (result.some) {
+  console.log(`Error messages: ${ result.val }`);
+}
 ```
