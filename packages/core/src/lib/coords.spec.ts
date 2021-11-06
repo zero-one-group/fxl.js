@@ -49,10 +49,10 @@ describe('basic coordinate helper functions', () => {
   });
 
   it('shift functions should work properly ', () => {
-    const shiftedUp = table.map((x) => coords.shiftUp(10, x));
+    const shiftedUp = table.map((x) => coords.shiftUp(10)(x));
     expect(coords.maxRow(shiftedUp)).toBe(-9);
     expect(coords.maxCol(shiftedUp)).toBe(1);
-    const shiftedLeft = table.map((x) => coords.shiftLeft(5, x));
+    const shiftedLeft = table.map((x) => coords.shiftLeft(5)(x));
     expect(coords.maxRow(shiftedLeft)).toBe(1);
     expect(coords.maxCol(shiftedLeft)).toBe(-4);
   });
