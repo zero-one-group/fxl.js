@@ -10,6 +10,13 @@ function toError(key: string, cell: t.Cell): Err<t.Error> {
   return Err({ error: `invalid ${key} in ${prettyCell}` });
 }
 
+/**
+ * Returns an `Ok` of the input cell if the coordinate is valid, otherwise
+ * returns an `Err` of the error message.
+ *
+ * @param {t.Cell} cell
+ * @returns {Result<t.Cell, t.Error>}
+ */
 export function validateCoord(cell: t.Cell): Result<t.Cell, t.Error> {
   if (
     cell.coord.row >= 0 &&
@@ -33,6 +40,13 @@ function isValidArgb(maybeHex: string | undefined): boolean {
   }
 }
 
+/**
+ * Returns an `Ok` of the input cell if the font color is valid, otherwise
+ * returns an `Err` of the error message.
+ *
+ * @param {t.Cell} cell
+ * @returns {Result<t.Cell, t.Error>}
+ */
 export function validateFontColor(cell: t.Cell): Result<t.Cell, t.Error> {
   const argb = cell.style?.font?.color?.argb;
   if (isValidArgb(argb)) {
@@ -42,6 +56,13 @@ export function validateFontColor(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+/**
+ * Returns an `Ok` of the input cell if the fill colors are valid, otherwise
+ * returns an `Err` of the error message.
+ *
+ * @param {t.Cell} cell
+ * @returns {Result<t.Cell, t.Error>}
+ */
 export function validateFillColors(cell: t.Cell): Result<t.Cell, t.Error> {
   const fill = cell.style?.fill;
   if (fill == undefined) {
@@ -57,6 +78,13 @@ export function validateFillColors(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+/**
+ * Returns an `Ok` of the input cell if the border colors are valid, otherwise
+ * returns an `Err` of the error message.
+ *
+ * @param {t.Cell} cell
+ * @returns {Result<t.Cell, t.Error>}
+ */
 export function validateBorderColors(cell: t.Cell): Result<t.Cell, t.Error> {
   const borders = [
     cell.style?.border?.top?.color?.argb,
@@ -71,6 +99,13 @@ export function validateBorderColors(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+/**
+ * Returns an `Ok` of the input cell if the font size is valid, otherwise
+ * returns an `Err` of the error message.
+ *
+ * @param {t.Cell} cell
+ * @returns {Result<t.Cell, t.Error>}
+ */
 export function validateFontSize(cell: t.Cell): Result<t.Cell, t.Error> {
   const size = cell.style?.font?.size;
   if (size == undefined || size > 0) {
@@ -80,6 +115,13 @@ export function validateFontSize(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+/**
+ * Returns an `Ok` of the input cell if the cell size is valid, otherwise
+ * returns an `Err` of the error message.
+ *
+ * @param {t.Cell} cell
+ * @returns {Result<t.Cell, t.Error>}
+ */
 export function validateCellSize(cell: t.Cell): Result<t.Cell, t.Error> {
   const rowHeight = cell.style?.rowHeight;
   const colWidth = cell.style?.colWidth;
@@ -92,6 +134,13 @@ export function validateCellSize(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+/**
+ * Returns an `Ok` of the input cell if all validation checks pass, otherwise
+ * returns an `Err` of the error message.
+ *
+ * @param {t.Cell} cell
+ * @returns {Result<t.Cell, t.Error>}
+ */
 export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
   const validationResults = [
     validateCoord,
@@ -109,10 +158,23 @@ export function validateCell(cell: t.Cell): Result<t.ValidCell, t.Error> {
   }
 }
 
+/**
+ * Takes in an array of errors and returns one error with a combined message.
+ *
+ * @param {t.Error[]} errors
+ * @returns {t.Error}
+ */
 export function concatErrors(errors: t.Error[]): t.Error {
   return { error: errors.map((x) => x.error).join('\n') };
 }
 
+/**
+ * Takes in an array of `Result` objects, and splits the `Ok` and `Err`
+ * objects as a pair of arrays.
+ *
+ * @param {t.Result<T, U>[]} results
+ * @returns {[T[], U[]]}
+ */
 export function splitErrors<T, U>(results: Result<T, U>[]): [T[], U[]] {
   const values: T[] = [];
   const errors: U[] = [];

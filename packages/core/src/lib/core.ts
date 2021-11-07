@@ -35,6 +35,16 @@ function readExcelWorkbook(workbook: ExcelJS.Workbook): t.ValidCell[] {
   return cells;
 }
 
+/**
+ * Reads an XLSX file and returns an array of fxl cells if succsessful.
+ *
+ * @remarks
+ * The result is wrapped in ts-results' Result object:
+ * {@link https://github.com/vultix/ts-results#result-example}
+ *
+ * @param {string} fileName
+ * @returns {Promise<Result<t.ValidCell[], t.Error>>}
+ */
 export async function readXlsx(
   fileName: string
 ): Promise<Result<t.ValidCell[], t.Error>> {
@@ -48,6 +58,16 @@ export async function readXlsx(
   }
 }
 
+/**
+ * Reads an ExcelJS buffer and returns an array of fxl cells if succsessful.
+ *
+ * @remarks
+ * The result is wrapped in ts-results' Result object:
+ * {@link https://github.com/vultix/ts-results#result-example}
+ *
+ * @param {ExcelJS.Buffer} binary
+ * @returns {Promise<Result<t.ValidCell[], t.Error>>}
+ */
 export async function readBinary(
   binary: ExcelJS.Buffer
 ): Promise<Result<t.ValidCell[], t.Error>> {
@@ -126,6 +146,17 @@ function toExcelWorkbook(cells: t.Cell[]): Result<ExcelJS.Workbook, t.Error> {
   }
 }
 
+/**
+ * Writes a group of fxl cells into an XLSX file. Returns an optional error.
+ *
+ * @remarks
+ * The result is wrapped in ts-results' Option object:
+ * {@link https://github.com/vultix/ts-results#option-example}
+ *
+ * @param {t.Cell[]} cells
+ * @param {string} fileNme
+ * @returns {Promise<Option<t.Error>>>}
+ */
 export async function writeXlsx(
   cells: t.Cell[],
   fileName: string
@@ -139,6 +170,16 @@ export async function writeXlsx(
   }
 }
 
+/**
+ * Converts a group of fxl cells into an ExcelJS buffer if succsessful.
+ *
+ * @remarks
+ * The result is wrapped in ts-results' Result object:
+ * {@link https://github.com/vultix/ts-results#result-example}
+ *
+ * @param {t.Cell[]} cells
+ * @returns {Promise<Result<ExcelJS.Buffer, t.Error>>}
+ */
 export async function writeBinary(
   cells: t.Cell[]
 ): Promise<Result<ExcelJS.Buffer, t.Error>> {

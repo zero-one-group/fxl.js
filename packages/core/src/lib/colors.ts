@@ -1,4 +1,3 @@
-// TODO: handle incorrect hexes or make it type safe
 import * as t from './types';
 
 // Source: https://github.com/codebrainz/color-names
@@ -871,6 +870,16 @@ export const RGBS: Record<string, string> = {
   zinnwaldite_brown: '2C1608',
 };
 
+/**
+ * Takes a candidate color string and returns a solid Color object.
+ *
+ * @remarks
+ * fxl's Color interface is a based on ExcelJS' corresponding object:
+ * {@link https://github.com/exceljs/exceljs/blob/master/index.d.ts}
+ *
+ * @param {string} color
+ * @returns {t.Color}
+ */
 export function toColor(color: string): t.Color {
   if (color in RGBS) {
     return { argb: `FF${RGBS[color]}` };
@@ -879,7 +888,24 @@ export function toColor(color: string): t.Color {
   }
 }
 
+/**
+ * Takes a candidate color string and returns a Color object with adjustable alpha.
+ *
+ * @remarks
+ * fxl's Color interface is a based on ExcelJS' corresponding object:
+ * {@link https://github.com/exceljs/exceljs/blob/master/index.d.ts}
+ *
+ * @example
+ * ```ts
+ * const color = fxl.toAlphaColor('80', 'grey')
+ * ```
+ *
+ * @param {string} alpha - in upper-case hex.
+ * @param {string} color
+ * @returns {t.Color}
+ */
 export function toAlphaColor(alpha: string, color: string): t.Color {
+  // TODO: allow a float alpha value in [0, 1].
   if (color in RGBS) {
     return { argb: `${alpha}${RGBS[color]}` };
   } else {
