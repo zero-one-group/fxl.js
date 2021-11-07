@@ -1,4 +1,16 @@
 {
   "name": "@zog/fxl",
-  "version": "0.0.1"
+  "version": "0.0.1",
+	"description": "fxl.js is a data-oriented JavaScript spreadsheet library. It provides a way to build spreadsheets using modular, lego-like blocks.",
+  "license" : "Apache-2.0 License",
+  "keywords": [
+		"curried",
+		"data-oriented",
+		"fp",
+		"functional-programming",
+		"spreadsheet",
+    "excel",
+    "xlsx"
+  ],
+	"homepage": "https://github.com/zero-one-group/fxl.js"
 }
