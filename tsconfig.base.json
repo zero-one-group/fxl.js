@@ -16,7 +16,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@zog/fxl": ["packages/core/src/index.ts"]
+      "@01group/fxl": ["packages/core/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

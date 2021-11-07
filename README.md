@@ -119,7 +119,7 @@ const totalCells = [
 We then concatenate them, and ask _fxl.js_ to write the cells into an XLSX file:
 
 ```typescript
-import * as fxl from '@zog/fxl';
+import * as fxl from '@01group/fxl';
 
 const allCells = headerCells.concat(bodyCells).concat(totalCells);
 await fxl.writeXlsx(allCells, 'costs.xlsx')
@@ -138,7 +138,7 @@ const cells = await fxl.readXlsx('costs.xlsx')
 An important part of _fxl.js_ is the collection of shortcut functions that makes it easy to create the cell objects. We can boil down the above example to the following:
 
 ```typescript
-import * as fxl from '@zog/fxl';
+import * as fxl from '@01group/fxl';
 
 const costs = [
   { item: "Rent", cost: 1000 },
@@ -207,7 +207,7 @@ When we put our running example together, we actually see a relatively common pa
 5. finally executing the **IO** operation.
 
 ```typescript
-import * as fxl from '@zog/fxl';
+import * as fxl from '@01group/fxl';
 
 // ------------------------------------------------------------------
 // data

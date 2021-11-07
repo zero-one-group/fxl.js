@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import * as fxl from '@zog/fxl';
+import * as fxl from '@01group/fxl';
 
 // ---------------------------------------------------------------------------
 // Types
