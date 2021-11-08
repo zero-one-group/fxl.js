@@ -6,6 +6,9 @@
   "dependencies": {
     "tslib": "^2.0.0"
   },
+	"engines": {
+		"node": ">=8.0.0"
+	},
   "keywords": [
 		"curried",
 		"data-oriented",
