@@ -31,7 +31,7 @@ _fxl.js_ is a JavaScript adaptation of the original Clojure library [fxl](https:
 npm install @01group/fxl
 ```
 
-You may find the TypeDoc generated documentation [here](https://zero-one-group.github.io/fxl.js/modules.html).
+The TypeDoc generated documentation can be found [here](https://zero-one-group.github.io/fxl.js/modules.html).
 
 # Why _fxl.js_?
 
@@ -279,6 +279,8 @@ See also [ExcelJS' known issues](https://github.com/exceljs/exceljs#known-issues
 # Contributing
 
 _fxl.js_ is very much a work-in-progress. Whilst it is being used in production at [Zero One Group](www.zero-one-group.com), it may not be stable just yet. We would love your help to make it production ready! Any sort of contributions (issues, pull requests or general feedback) are all very welcomed!
+
+See the [contributing document](CONTRIBUTING.md).
 
 # Further Resources
 
