@@ -54,6 +54,7 @@ export async function readXlsx(
     const cells = readExcelWorkbook(workbook);
     return Ok(cells);
   } catch (exception) {
+    // TODO: exception should be of type unknown
     return Err({ error: (exception as Error).message });
   }
 }
@@ -77,6 +78,7 @@ export async function readBinary(
     const cells = readExcelWorkbook(workbook);
     return Ok(cells);
   } catch (exception) {
+    // TODO: exception should be of type unknown
     return Err({ error: (exception as Error).message });
   }
 }
