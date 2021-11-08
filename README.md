@@ -31,6 +31,8 @@ _fxl.js_ is a JavaScript adaptation of the original Clojure library [fxl](https:
 npm install @01group/fxl
 ```
 
+You may find the TypeDoc generated documentation [here](https://zero-one-group.github.io/fxl.js/modules.html).
+
 # Why _fxl.js_?
 
 There are three things that _fxl.js_ tries to do differently compared to other JavaScript spreadsheet libraries, namely:
