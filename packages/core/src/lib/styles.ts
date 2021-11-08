@@ -97,7 +97,7 @@ export function setSolidBg(color: string): t.Monoid<t.Cell> {
 // Border Shortcuts
 // ---------------------------------------------------------------------------
 function getBorders(cell: t.Cell): t.Borders {
-  return cell.style?.border || {};
+  return cell.style?.border ?? {};
 }
 
 /**
@@ -168,7 +168,7 @@ export function toBorder(style: t.BorderStyle, color: string): t.Border {
 // Alignment Shortcuts
 // ---------------------------------------------------------------------------
 function getAlignment(cell: t.Cell): t.Alignment {
-  return cell.style?.alignment || {};
+  return cell.style?.alignment ?? {};
 }
 
 /**
@@ -231,7 +231,7 @@ export function setWrapText(wrapText: boolean): t.Monoid<t.Cell> {
 // Font Shortcuts
 // ---------------------------------------------------------------------------
 function getFont(cell: t.Cell): t.Font {
-  return cell.style?.font || {};
+  return cell.style?.font ?? {};
 }
 
 /**
