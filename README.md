@@ -27,7 +27,9 @@ _fxl.js_ is a JavaScript adaptation of the original Clojure library [fxl](https:
 
 # Installation
 
-_fxl.js_ has not been released yet.
+```
+npm install @01group/fxl
+```
 
 # Why _fxl.js_?
 
