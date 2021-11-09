@@ -54,7 +54,3 @@ export interface Cell {
 export type ValidCell = Opaque<'ValidCell', Cell>;
 
 export type Monoid<T> = (arg: T) => T;
-
-export function isFillPattern(fill: Fill): fill is FillPattern {
-  return fill.type == 'pattern';
-}
