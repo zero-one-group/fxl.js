@@ -8,7 +8,18 @@
     },
     {
       "files": ["*.ts", "*.tsx"],
-      "rules": {}
+      "parserOptions": {
+        "project": ["packages/core/tsconfig.*?.json"]
+      },
+      "extends": [
+				"plugin:@nrwl/nx/typescript",
+				"plugin:@typescript-eslint/recommended-requiring-type-checking"
+			],
+      "rules": {
+				"@typescript-eslint/no-unsafe-assignment": "error",
+				"@typescript-eslint/no-unsafe-return": "error",
+				"@typescript-eslint/no-explicit-any": "error"
+			}
     },
     {
       "files": ["*.js", "*.jsx"],
