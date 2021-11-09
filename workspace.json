@@ -30,7 +30,7 @@
             "tsConfig": "packages/core/tsconfig.lib.json",
             "packageJson": "packages/core/package.json",
             "main": "packages/core/src/index.ts",
-            "assets": ["packages/core/*.md"]
+            "assets": ["README.md"]
           }
         }
       }

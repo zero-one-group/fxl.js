@@ -25,12 +25,28 @@ describe('basic reading and writing xlsx', () => {
 
   it('writeXlsx should take in valid cells', async () => {
     const cell = toCell('abc');
+    const style = { colWidth: 1, rowHeight: 1 };
+    const cells = [
+      { ...cell, style: style },
+      { ...cell, coord: { row: 1, col: 0 }, style: style },
+      { ...cell, coord: { row: 0, col: 1 }, style: style },
+      {
+        ...cell,
+        coord: { row: 1, col: 1, sheet: 'abc' },
+        style: style,
+      },
+    ];
     const tempFile = temp.openSync('excel-temp');
-    await core.writeXlsx([cell], tempFile.path);
+    await core.writeXlsx(cells, tempFile.path);
     const result = await core.readXlsx(tempFile.path);
     const loadedCells = utils.extractOk(result);
-    expect(loadedCells.length).toBe(1);
-    expect(loadedCells.map((x) => x.value)).toEqual([cell.value]);
+    expect(loadedCells.length).toBe(4);
+    expect(loadedCells.map((x) => x.value)).toEqual([
+      cell.value,
+      cell.value,
+      cell.value,
+      cell.value,
+    ]);
   });
 
   it('writeXlsx should fail gracefully', async () => {

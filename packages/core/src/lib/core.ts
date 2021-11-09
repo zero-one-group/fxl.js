@@ -54,7 +54,8 @@ export async function readXlsx(
     const cells = readExcelWorkbook(workbook);
     return Ok(cells);
   } catch (exception) {
-    return Err({ error: exception.message });
+    // TODO: exception should be of type unknown
+    return Err({ error: (exception as Error).message });
   }
 }
 
@@ -77,18 +78,19 @@ export async function readBinary(
     const cells = readExcelWorkbook(workbook);
     return Ok(cells);
   } catch (exception) {
-    return Err({ error: exception.message });
+    // TODO: exception should be of type unknown
+    return Err({ error: (exception as Error).message });
   }
 }
 
 function setCells(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
   cells.forEach((cell) => {
-    const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
+    const sheetName = cell.coord.sheet ?? DEFAULT_SHEET_NAME;
     const worksheet =
-      workbook.getWorksheet(sheetName) || workbook.addWorksheet(sheetName);
+      workbook.getWorksheet(sheetName) ?? workbook.addWorksheet(sheetName);
     const excelCell = worksheet.getCell(cell.coord.row + 1, cell.coord.col + 1);
     excelCell.value = cell.value;
-    excelCell.style = cell.style || {};
+    excelCell.style = cell.style ?? {};
   });
 }
 
@@ -96,20 +98,20 @@ function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
   const colWidths: t.CellSizes = new Map();
   const rowHeights: t.CellSizes = new Map();
   cells.forEach((cell) => {
-    const sheetName = cell.coord.sheet || DEFAULT_SHEET_NAME;
+    const sheetName = cell.coord.sheet ?? DEFAULT_SHEET_NAME;
     const { row: row, col: col } = cell.coord;
     const colWidth = cell.style?.colWidth;
     if (colWidth) {
-      const sheetColWidths = colWidths.get(sheetName) || new Map();
-      const thisColWidths = sheetColWidths.get(col) || [];
+      const sheetColWidths = colWidths.get(sheetName) ?? new Map();
+      const thisColWidths = sheetColWidths.get(col) ?? [];
       thisColWidths.push(colWidth);
       sheetColWidths.set(col, thisColWidths);
       colWidths.set(sheetName, sheetColWidths);
     }
     const rowHeight = cell.style?.rowHeight;
     if (rowHeight) {
-      const sheetRowHeights = rowHeights.get(sheetName) || new Map();
-      const thisRowHeights = sheetRowHeights.get(row) || [];
+      const sheetRowHeights = rowHeights.get(sheetName) ?? new Map();
+      const thisRowHeights = sheetRowHeights.get(row) ?? [];
       thisRowHeights.push(rowHeight);
       sheetRowHeights.set(col, thisRowHeights);
       rowHeights.set(sheetName, sheetRowHeights);

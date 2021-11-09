@@ -27,7 +27,11 @@ _fxl.js_ is a JavaScript adaptation of the original Clojure library [fxl](https:
 
 # Installation
 
-_fxl.js_ has not been released yet.
+```
+npm install @01group/fxl
+```
+
+The TypeDoc generated documentation can be found [here](https://zero-one-group.github.io/fxl.js/modules.html).
 
 # Why _fxl.js_?
 
@@ -119,7 +123,7 @@ const totalCells = [
 We then concatenate them, and ask _fxl.js_ to write the cells into an XLSX file:
 
 ```typescript
-import * as fxl from '@zog/fxl.js';
+import * as fxl from '@01group/fxl';
 
 const allCells = headerCells.concat(bodyCells).concat(totalCells);
 await fxl.writeXlsx(allCells, 'costs.xlsx')
@@ -138,7 +142,7 @@ const cells = await fxl.readXlsx('costs.xlsx')
 An important part of _fxl.js_ is the collection of shortcut functions that makes it easy to create the cell objects. We can boil down the above example to the following:
 
 ```typescript
-import * as fxl from '@zog/fxl.js';
+import * as fxl from '@01group/fxl';
 
 const costs = [
   { item: "Rent", cost: 1000 },
@@ -207,7 +211,7 @@ When we put our running example together, we actually see a relatively common pa
 5. finally executing the **IO** operation.
 
 ```typescript
-import * as fxl from '@zog/fxl.js';
+import * as fxl from '@01group/fxl';
 
 // ------------------------------------------------------------------
 // data
@@ -275,6 +279,8 @@ See also [ExcelJS' known issues](https://github.com/exceljs/exceljs#known-issues
 # Contributing
 
 _fxl.js_ is very much a work-in-progress. Whilst it is being used in production at [Zero One Group](www.zero-one-group.com), it may not be stable just yet. We would love your help to make it production ready! Any sort of contributions (issues, pull requests or general feedback) are all very welcomed!
+
+See the [contributing document](CONTRIBUTING.md).
 
 # Further Resources
 

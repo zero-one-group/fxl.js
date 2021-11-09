@@ -76,6 +76,8 @@ Before we start the spreadsheet building process, we first need to prepare the d
 ```typescript
 import * as fs from 'fs';
 
+import * as fxl from '@01group/fxl';
+
 const JSON_PATH = 'packages/example/src/assets/inventory.json';
 const RAW_DATA = fs.readFileSync(JSON_PATH).toString();
 const INVENTORY = JSON.parse(RAW_DATA);

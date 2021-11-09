@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import * as fxl from '@zog/fxl.js';
+import * as fxl from '@01group/fxl';
 
 // ---------------------------------------------------------------------------
 // Types
