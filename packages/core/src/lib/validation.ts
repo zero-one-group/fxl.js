@@ -56,6 +56,10 @@ export function validateFontColor(cell: t.Cell): Result<t.Cell, t.Error> {
   }
 }
 
+function isFillPattern(fill: t.Fill): fill is t.FillPattern {
+  return fill.type == 'pattern';
+}
+
 /**
  * Returns an `Ok` of the input cell if the fill colors are valid, otherwise
  * returns an `Err` of the error message.
@@ -67,7 +71,7 @@ export function validateFillColors(cell: t.Cell): Result<t.Cell, t.Error> {
   const fill = cell.style?.fill;
   if (fill == undefined) {
     return Ok(cell);
-  } else if (t.isFillPattern(fill)) {
+  } else if (isFillPattern(fill)) {
     if (isValidArgb(fill.fgColor?.argb) && isValidArgb(fill.bgColor?.argb)) {
       return Ok(cell);
     } else {
