@@ -94,6 +94,10 @@ function setCells(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
   });
 }
 
+function newSizeMap(): Map<number, number[]> {
+  return new Map();
+}
+
 function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
   const colWidths: t.CellSizes = new Map();
   const rowHeights: t.CellSizes = new Map();
@@ -102,7 +106,7 @@ function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
     const { row: row, col: col } = cell.coord;
     const colWidth = cell.style?.colWidth;
     if (colWidth) {
-      const sheetColWidths = colWidths.get(sheetName) ?? new Map();
+      const sheetColWidths = colWidths.get(sheetName) ?? newSizeMap();
       const thisColWidths = sheetColWidths.get(col) ?? [];
       thisColWidths.push(colWidth);
       sheetColWidths.set(col, thisColWidths);
@@ -110,7 +114,7 @@ function scanCellSizes(cells: t.Cell[]): [t.CellSizes, t.CellSizes] {
     }
     const rowHeight = cell.style?.rowHeight;
     if (rowHeight) {
-      const sheetRowHeights = rowHeights.get(sheetName) ?? new Map();
+      const sheetRowHeights = rowHeights.get(sheetName) ?? newSizeMap();
       const thisRowHeights = sheetRowHeights.get(row) ?? [];
       thisRowHeights.push(rowHeight);
       sheetRowHeights.set(col, thisRowHeights);
