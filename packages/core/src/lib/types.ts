@@ -1,6 +1,6 @@
 import * as ExcelJS from 'exceljs';
 
-type Opaque<K, T> = T & { __TYPE__: K };
+export type Opaque<K, T> = T & { __TYPE__: K };
 
 export interface Error {
   error: string;
