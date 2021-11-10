@@ -2,7 +2,11 @@
   "name": "fxl.js",
   "version": "0.0.0",
   "license" : "Apache-2.0 License",
-  "scripts": {},
+  "scripts": {
+    "build": "yarn nx build core",
+    "publish": "yarn build && cd dist/packages/core && yarn publish --access public",
+    "docs": "yarn build && cd packages/core/src && npx typedoc index.ts --out ../../../api-docs --readme ../../../README.md"
+  },
   "private": true,
   "dependencies": {
     "exceljs": "^4.3.0",
