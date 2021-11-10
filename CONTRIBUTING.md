@@ -10,4 +10,4 @@ First and foremost, thank you for taking an interest to contribute to _fxl.js_. 
 * Bump the version in `packages/core/package.json`.
 * Update the API documentation by running `yarn docs`.
 * Create a PR to merge to the upstream `develop` branch.
-* Publish the package by running `yarn publish` upstream.
+* Publish the package by running `yarn publish-to-npm` upstream.

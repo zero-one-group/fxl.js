@@ -4,7 +4,7 @@
   "license" : "Apache-2.0 License",
   "scripts": {
     "build": "yarn nx build core",
-    "publish": "yarn build && cd dist/packages/core && yarn publish --access public",
+    "publish-to-npm": "yarn build && cd dist/packages/core && yarn publish --access public",
     "docs": "yarn build && cd packages/core/src && npx typedoc index.ts --out ../../../api-docs --readme ../../../README.md"
   },
   "private": true,
