@@ -85,10 +85,21 @@ export async function readBinary(
 
 function setCells(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
   cells.forEach((cell) => {
+    const coord = cell.coord;
     const sheetName = cell.coord.sheet ?? DEFAULT_SHEET_NAME;
     const worksheet =
       workbook.getWorksheet(sheetName) ?? workbook.addWorksheet(sheetName);
-    const excelCell = worksheet.getCell(cell.coord.row + 1, cell.coord.col + 1);
+
+    if ('height' in coord || 'width' in coord) {
+      worksheet.mergeCells(
+        coord.row,
+        coord.col,
+        coord.row + coord.height - 1,
+        coord.col + coord.width - 1
+      );
+    }
+
+    const excelCell = worksheet.getCell(coord.row + 1, coord.col + 1);
     excelCell.value = cell.value;
     excelCell.style = cell.style ?? {};
   });

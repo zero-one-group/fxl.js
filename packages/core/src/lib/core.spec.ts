@@ -2,6 +2,7 @@ import * as ExcelJS from 'exceljs';
 import * as temp from 'temp';
 
 import * as core from './core';
+import * as coords from './coords';
 import * as utils from './test-utils';
 import { toCell } from './cells';
 import { validateCell } from './validation';
@@ -102,6 +103,19 @@ describe('cell style capture', () => {
     const readResult = await core.readBinary(utils.extractOk(writeResult));
     const loaded = utils.extractOk(readResult);
     expect(loaded.map((x) => x?.style)).toEqual([{}]);
+  });
+
+  it('write-then-read with merged cells should work', async () => {
+    const coord = { row: 1, col: 1, height: 3, width: 4 };
+    const cell = { value: 'abc-xyz-123', coord };
+    const writeResult = await core.writeBinary([cell]);
+    const readResult = await core.readBinary(utils.extractOk(writeResult));
+    const values = coords.cellsToTable(utils.extractOk(readResult));
+    expect(values).toEqual([
+      ['abc-xyz-123', 'abc-xyz-123', 'abc-xyz-123', 'abc-xyz-123'],
+      ['abc-xyz-123', 'abc-xyz-123', 'abc-xyz-123', 'abc-xyz-123'],
+      ['abc-xyz-123', 'abc-xyz-123', 'abc-xyz-123', 'abc-xyz-123'],
+    ]);
   });
 });
 
