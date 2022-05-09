@@ -23,6 +23,15 @@ describe('basic coordinate helper functions', () => {
       'abc-xyz',
       'abc-xyz',
     ]);
+    expect(cells.map(coords.height)).toEqual([1, 1, 1]);
+    expect(cells.map(coords.width)).toEqual([1, 1, 1]);
+  });
+
+  it('setSheet should work properly', () => {
+    const coord = { row: 0, col: 0, height: 3, width: 4 };
+    const cells = row.map(coords.setCoord(coord));
+    expect(cells.map(coords.height)).toEqual([3, 3, 3]);
+    expect(cells.map(coords.width)).toEqual([4, 4, 4]);
   });
 
   it('concatBelow should work properly', () => {

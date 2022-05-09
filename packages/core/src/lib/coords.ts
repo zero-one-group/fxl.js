@@ -2,6 +2,16 @@ import { toCell } from './cells';
 import * as t from './types';
 
 /**
+ * Returns a new Cell with modified coordinate.
+ *
+ * @param {string} sheetName
+ * @returns {t.Monoid<t.Cell>}
+ */
+export function setCoord(coord: t.AnyCoord): t.Monoid<t.Cell> {
+  return (cell: t.Cell) => ({ ...cell, coord });
+}
+
+/**
  * Returns a new Cell with modified sheet name.
  *
  * @param {string} sheetName
@@ -12,6 +22,26 @@ export function setSheet(sheetName: string): t.Monoid<t.Cell> {
     const coord = { ...cell.coord, sheet: sheetName };
     return { ...cell, coord: coord };
   };
+}
+
+/**
+ * Returns the height of the cell. Defaults to 1.
+ *
+ * @param {string} sheetName
+ * @returns {t.Monoid<t.Cell>}
+ */
+export function height(cell: t.Cell): number {
+  return 'height' in cell.coord ? cell.coord.height : 1;
+}
+
+/**
+ * Returns the width of the cell. Defaults to 1.
+ *
+ * @param {string} sheetName
+ * @returns {t.Monoid<t.Cell>}
+ */
+export function width(cell: t.Cell): number {
+  return 'width' in cell.coord ? cell.coord.width : 1;
 }
 
 /**
