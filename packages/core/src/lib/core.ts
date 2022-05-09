@@ -94,8 +94,8 @@ function setCells(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
       worksheet.mergeCells(
         coord.row,
         coord.col,
-        coord.row + coord.height - 1,
-        coord.col + coord.width - 1
+        coord.row + coord.height,
+        coord.col + coord.width
       );
     }
 

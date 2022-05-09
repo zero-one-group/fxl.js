@@ -106,7 +106,7 @@ describe('cell style capture', () => {
   });
 
   it('write-then-read with merged cells should work', async () => {
-    const coord = { row: 1, col: 1, height: 3, width: 4 };
+    const coord = { row: 0, col: 0, height: 3, width: 4 };
     const cell = { value: 'abc-xyz-123', coord };
     const writeResult = await core.writeBinary([cell]);
     const readResult = await core.readBinary(utils.extractOk(writeResult));

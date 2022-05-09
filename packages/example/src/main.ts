@@ -48,6 +48,20 @@ const FORM_DATA = {
 };
 
 // ---------------------------------------------------------------------------
+// Component 0: Title
+// ---------------------------------------------------------------------------
+const title = [
+  fxl.pipe(
+    fxl.toCell(`INVENTORY REPORT (Year ${new Date().getFullYear()})`),
+    fxl.setCoord({ row: 0, col: 0, width: 10, height: 3 }),
+    fxl.setBold(true),
+    fxl.setUnderline(true),
+    fxl.setFontSize(18),
+    fxl.setHorizontalAlignement('center')
+  ),
+];
+
+// ---------------------------------------------------------------------------
 // Component 1: Form Headers
 // ---------------------------------------------------------------------------
 const plainFormHeader = fxl.tableToCells([
@@ -199,13 +213,14 @@ const inventoryTables = fxl.concatBelow(
 // Integration: Full Report
 // ---------------------------------------------------------------------------
 const unstyledReport = fxl.concatBelow(
+  fxl.padBelow(2, title),
   fxl.padBelow(2, formHeader),
   fxl.padBelow(2, inventoryTables),
   fxl.concatRight(fxl.padRight(2, createFooter), checkFooter)
 );
 
 function setAutoColWidth(cell: fxl.Cell): fxl.Cell {
-  if (cell.value) {
+  if (cell.value && cell.coord.row != 0) {
     const colWidth = Math.max(cell.value.toString().length, 10);
     return fxl.setColWidth(colWidth)(cell);
   } else {
