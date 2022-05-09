@@ -1,7 +1,7 @@
 {
   "name": "fxl.js",
   "version": "0.0.0",
-  "license" : "Apache-2.0 License",
+  "license": "Apache-2.0 License",
   "scripts": {
     "build": "yarn nx build core",
     "publish-to-npm": "yarn build && cd dist/packages/core && yarn publish --access public",

@@ -14,6 +14,10 @@ export interface Coord {
   sheet?: string;
 }
 
+export type MergedCoord = Coord & { width: number; height: number };
+
+export type AnyCoord = Coord | MergedCoord;
+
 export interface Style extends Partial<ExcelJS.Style> {
   colWidth?: number;
   rowHeight?: number;
@@ -47,7 +51,7 @@ export interface Color {
 
 export interface Cell {
   value: Value;
-  coord: Coord;
+  coord: AnyCoord;
   style?: Style;
 }
 

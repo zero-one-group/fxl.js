@@ -7,6 +7,14 @@ describe('basic coordinate helper functions', () => {
   ]);
   const column = coords.colToCells([undefined, true, false]);
   const row = coords.rowToCells([1, undefined, 3]);
+  const colWithMerges = [
+    { value: 'abc', coord: { row: 0, col: 0, height: 2, width: 2 } },
+    { value: 'def', coord: { row: 2, col: 0, height: 2, width: 2 } },
+  ];
+  const rowWithMerges = [
+    { value: '123', coord: { row: 0, col: 0, height: 2, width: 2 } },
+    { value: '456', coord: { row: 0, col: 2, height: 2, width: 2 } },
+  ];
 
   it('setSheet should work properly', () => {
     const cells = row.map(coords.setSheet('abc-xyz'));
@@ -15,6 +23,15 @@ describe('basic coordinate helper functions', () => {
       'abc-xyz',
       'abc-xyz',
     ]);
+    expect(cells.map(coords.height)).toEqual([1, 1, 1]);
+    expect(cells.map(coords.width)).toEqual([1, 1, 1]);
+  });
+
+  it('setSheet should work properly', () => {
+    const coord = { row: 0, col: 0, height: 3, width: 4 };
+    const cells = row.map(coords.setCoord(coord));
+    expect(cells.map(coords.height)).toEqual([3, 3, 3]);
+    expect(cells.map(coords.width)).toEqual([4, 4, 4]);
   });
 
   it('concatBelow should work properly', () => {
@@ -24,6 +41,19 @@ describe('basic coordinate helper functions', () => {
       ['a', 'b', undefined],
       ['x', 'y', undefined],
       [1, undefined, 3],
+    ]);
+  });
+
+  it('concatBelow should work properly with merged cells', () => {
+    const cells = coords.concatBelow(colWithMerges, table);
+    const outputTable = coords.cellsToTable(cells);
+    expect(outputTable).toEqual([
+      ['abc', undefined],
+      [undefined, undefined],
+      ['def', undefined],
+      [undefined, undefined],
+      ['a', 'b'],
+      ['x', 'y'],
     ]);
   });
 
@@ -37,7 +67,16 @@ describe('basic coordinate helper functions', () => {
     ]);
   });
 
-  it('maxRow and maxCol should work properly', () => {
+  it('concatRight should work properly with merged cells', () => {
+    const cells = coords.concatRight(rowWithMerges, table);
+    const outputTable = coords.cellsToTable(cells);
+    expect(outputTable).toEqual([
+      ['123', undefined, '456', undefined, 'a', 'b'],
+      [undefined, undefined, undefined, undefined, 'x', 'y'],
+    ]);
+  });
+
+  it('maxRow, maxCol lowestRow and lowestCol should work properly', () => {
     expect(coords.maxRow(table)).toBe(1);
     expect(coords.maxCol(table)).toBe(1);
     expect(coords.maxRow(column)).toBe(2);
@@ -46,6 +85,8 @@ describe('basic coordinate helper functions', () => {
     expect(coords.maxCol(row)).toBe(2);
     expect(coords.maxRow([])).toBe(-1);
     expect(coords.maxCol([])).toBe(-1);
+    expect(coords.lowestRow([])).toBe(-1);
+    expect(coords.rightmostCol([])).toBe(-1);
   });
 
   it('shift functions should work properly ', () => {
@@ -101,6 +142,22 @@ describe('basic coordinate helper functions', () => {
     expect(coords.cellsToTable(paddedLeft)).toEqual([
       [undefined, undefined, 'a', 'b'],
       [undefined, undefined, 'x', 'y'],
+    ]);
+  });
+
+  it('pad functions should work properly with merged cells', () => {
+    expect(coords.cellsToTable(coords.padRight(2, colWithMerges))).toEqual([
+      ['abc', undefined, undefined, undefined],
+      [undefined, undefined, undefined, undefined],
+      ['def', undefined, undefined, undefined],
+    ]);
+    expect(coords.cellsToTable(coords.padBelow(2, colWithMerges))).toEqual([
+      ['abc'],
+      [undefined],
+      ['def'],
+      [undefined],
+      [undefined],
+      [undefined],
     ]);
   });
 });
