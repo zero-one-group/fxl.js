@@ -117,7 +117,8 @@ function range(num: number): number[] {
 export function cellsToTable(cells: t.Cell[]): t.Value[][] {
   const cellLookup: Record<string, t.Value> = {};
   cells.forEach((cell) => {
-    cellLookup[JSON.stringify(cell.coord)] = cell.value;
+    const { row, col } = cell.coord;
+    cellLookup[JSON.stringify({ row, col })] = cell.value;
   });
 
   return range(maxRow(cells) + 1).map((rowIndex) => {
@@ -139,6 +140,25 @@ export function maxRow(cells: t.Cell[]): number {
     return -1;
   } else {
     const rowIndices = cells.map((cell) => cell.coord.row);
+    return Math.max(...rowIndices);
+  }
+}
+
+/**
+ * Takes an array of cells and returns the maximum row index including merged coords.
+ *
+ * @param {t.Cell[]} cells
+ * @returns {number}
+ */
+export function lowestRow(cells: t.Cell[]): number {
+  if (cells.length == 0) {
+    return -1;
+  } else {
+    const rowIndices = cells.map((cell) => {
+      const coord = cell.coord;
+      const height = 'height' in coord ? coord.height : 1;
+      return coord.row + (height - 1);
+    });
     return Math.max(...rowIndices);
   }
 }
@@ -182,6 +202,25 @@ export function maxCol(cells: t.Cell[]): number {
 }
 
 /**
+ * Takes an array of cells and returns the maximum column index including merged coords.
+ *
+ * @param {t.Cell[]} cells
+ * @returns {number}
+ */
+export function rightmostCol(cells: t.Cell[]): number {
+  if (cells.length == 0) {
+    return -1;
+  } else {
+    const colIndices = cells.map((cell) => {
+      const coord = cell.coord;
+      const width = 'width' in coord ? coord.width : 1;
+      return coord.col + (width - 1);
+    });
+    return Math.max(...colIndices);
+  }
+}
+
+/**
  * Returns a function that shifts a cell to the right by `shift` columns.
  *
  * @param {number} shift
@@ -205,7 +244,7 @@ export function shiftLeft(shift: number): t.Monoid<t.Cell> {
 }
 
 function concatBelowTwoGroups(left: t.Cell[], right: t.Cell[]): t.Cell[] {
-  const shift = maxRow(left) + 1;
+  const shift = lowestRow(left) + 1;
   const shiftedRight = right.map((cell) => shiftDown(shift)(cell));
   return left.concat(shiftedRight);
 }
@@ -252,7 +291,7 @@ export function padAbove(numPad: number, cells: t.Cell[]): t.Cell[] {
 }
 
 function concatRightTwoGroups(left: t.Cell[], right: t.Cell[]): t.Cell[] {
-  const numPad = maxCol(left) + 1;
+  const numPad = rightmostCol(left) + 1;
   const shiftedRight = right.map((cell) => shiftRight(numPad)(cell));
   return left.concat(shiftedRight);
 }

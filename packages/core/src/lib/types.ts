@@ -14,13 +14,7 @@ export interface Coord {
   sheet?: string;
 }
 
-export interface MergedCoord {
-  row: number;
-  col: number;
-  width: number;
-  height: number;
-  sheet?: string;
-}
+export type MergedCoord = Coord & { width: number; height: number };
 
 export type AnyCoord = Coord | MergedCoord;
 
