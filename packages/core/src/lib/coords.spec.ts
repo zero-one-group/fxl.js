@@ -135,6 +135,22 @@ describe('basic coordinate helper functions', () => {
       [undefined, undefined, 'x', 'y'],
     ]);
   });
+
+  it('pad functions should work properly with merged cells', () => {
+    expect(coords.cellsToTable(coords.padRight(2, colWithMerges))).toEqual([
+      ['abc', undefined, undefined, undefined],
+      [undefined, undefined, undefined, undefined],
+      ['def', undefined, undefined, undefined],
+    ]);
+    expect(coords.cellsToTable(coords.padBelow(2, colWithMerges))).toEqual([
+      ['abc'],
+      [undefined],
+      ['def'],
+      [undefined],
+      [undefined],
+      [undefined],
+    ]);
+  });
 });
 
 describe('basic cell creation helper functions', () => {
