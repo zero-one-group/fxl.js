@@ -22,7 +22,9 @@ export function validateCoord(cell: t.Cell): Result<t.Cell, t.Error> {
     cell.coord.row >= 0 &&
     cell.coord.row <= MAX_ROWS &&
     cell.coord.col >= 0 &&
-    cell.coord.col <= MAX_COLS
+    cell.coord.col <= MAX_COLS &&
+    ('width' in cell.coord ? cell.coord.height : 0) >= 0 &&
+    ('height' in cell.coord ? cell.coord.height : 0) >= 0
   ) {
     return Ok(cell);
   } else {

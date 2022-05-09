@@ -14,6 +14,9 @@ describe('validation functions', () => {
     const validCellWithSheet = { ...validCell, coord: withSheet };
     expect(validateCoord(validCellWithSheet).val).toEqual(validCellWithSheet);
     expect(validateCoord(invalidCell).val).toHaveProperty('error');
+    const invalidMergedCoord = { row: 0, col: 0, height: -1 };
+    const invalidMergedCell = { value: 'abc', coord: invalidMergedCoord };
+    expect(validateCoord(invalidMergedCell).val).toHaveProperty('error');
   });
 
   it('font size validation should work', () => {
