@@ -11,7 +11,7 @@
   "dependencies": {
     "exceljs": "^4.3.0",
     "ts-results": "^3.3.0",
-    "tslib": "^2.0.0"
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@nrwl/cli": "12.9.0",
