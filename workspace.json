@@ -90,5 +90,5 @@
   "cli": {
     "defaultCollection": "@nrwl/node"
   },
-  "defaultProject": "example"
+  "defaultProject": "core"
 }
