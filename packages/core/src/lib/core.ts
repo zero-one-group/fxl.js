@@ -92,8 +92,8 @@ function setCells(workbook: ExcelJS.Workbook, cells: t.ValidCell[]): void {
 
     if ('height' in coord || 'width' in coord) {
       worksheet.mergeCells(
-        coord.row,
-        coord.col,
+        coord.row + 1,
+        coord.col + 1,
         coord.row + coord.height,
         coord.col + coord.width
       );

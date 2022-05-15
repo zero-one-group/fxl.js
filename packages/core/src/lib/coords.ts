@@ -201,7 +201,8 @@ export function lowestRow(cells: t.Cell[]): number {
  */
 export function shiftDown(shift: number): t.Monoid<t.Cell> {
   return (cell) => {
-    const newCoord = { row: cell.coord.row + shift, col: cell.coord.col };
+    const newCoord = { ...cell.coord };
+    newCoord.row = newCoord.row + shift;
     return { ...cell, coord: newCoord };
   };
 }
@@ -258,7 +259,8 @@ export function rightmostCol(cells: t.Cell[]): number {
  */
 export function shiftRight(shift: number): t.Monoid<t.Cell> {
   return (cell) => {
-    const newCoord = { row: cell.coord.row, col: cell.coord.col + shift };
+    const newCoord = { ...cell.coord };
+    newCoord.col = newCoord.col + shift;
     return { ...cell, coord: newCoord };
   };
 }
