@@ -268,7 +268,7 @@ const allCells = fxl
 await fxl.writeXlsx(allCells, 'costs.xlsx')
 ```
 
-See also the [inventory-spreadsheet walkthrough](guides/walkthrough.md) and its [accompanying script](packages/example/src/main.ts) for a more detailed example based on a real use case.
+See also the [inventory-spreadsheet walkthrough](guides/inventory-spreadsheet-walkthrough.md) and its [accompanying script](packages/example/src/main.ts) for a more detailed example based on a real use case.
 
 # Known Issues
 
