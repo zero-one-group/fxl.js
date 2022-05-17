@@ -55,6 +55,18 @@ describe('basic coordinate helper functions', () => {
       ['a', 'b'],
       ['x', 'y'],
     ]);
+
+    const concattedMerges = coords.concatBelow(colWithMerges, colWithMerges);
+    const concattedMergesValues = coords.cellsToTable(concattedMerges);
+    expect(concattedMergesValues).toEqual([
+      ['abc'],
+      [undefined],
+      ['def'],
+      [undefined],
+      ['abc'],
+      [undefined],
+      ['def'],
+    ]);
   });
 
   it('concatRight should work properly', () => {

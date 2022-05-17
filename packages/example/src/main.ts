@@ -50,16 +50,24 @@ const FORM_DATA = {
 // ---------------------------------------------------------------------------
 // Component 0: Title
 // ---------------------------------------------------------------------------
-const title = [
-  fxl.pipe(
-    fxl.toCell(`INVENTORY REPORT (Year ${new Date().getFullYear()})`),
-    fxl.setCoord({ row: 0, col: 0, width: 10, height: 3 }),
-    fxl.setBold(true),
-    fxl.setUnderline(true),
-    fxl.setFontSize(18),
-    fxl.setHorizontalAlignement('center')
-  ),
-];
+const titleCell = fxl.pipe(
+  fxl.toCell(`INVENTORY REPORT (Year ${new Date().getFullYear()})`),
+  fxl.setCoord({ row: 0, col: 0, width: 10, height: 3 }),
+  fxl.setBold(true),
+  fxl.setUnderline(true),
+  fxl.setFontSize(18),
+  fxl.setHorizontalAlignement('center')
+);
+
+const subtitleCell = fxl.pipe(
+  fxl.toCell(`Created at: ${new Date().toDateString()}`),
+  fxl.setCoord({ row: 0, col: 0, width: 10, height: 2 }),
+  fxl.setItalic(true),
+  fxl.setFontSize(12),
+  fxl.setHorizontalAlignement('center')
+);
+
+const titleCells = fxl.concatBelow([titleCell], [subtitleCell]);
 
 // ---------------------------------------------------------------------------
 // Component 1: Form Headers
@@ -213,7 +221,7 @@ const inventoryTables = fxl.concatBelow(
 // Integration: Full Report
 // ---------------------------------------------------------------------------
 const unstyledReport = fxl.concatBelow(
-  fxl.padBelow(2, title),
+  fxl.padBelow(2, titleCells),
   fxl.padBelow(2, formHeader),
   fxl.padBelow(2, inventoryTables),
   fxl.concatRight(fxl.padRight(2, createFooter), checkFooter)
