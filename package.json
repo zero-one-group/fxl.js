@@ -9,7 +9,7 @@
   },
   "private": true,
   "dependencies": {
-    "exceljs": "^4.3.0",
+    "exceljs": "^4.4.0",
     "ts-results": "^3.3.0",
     "tslib": "^2.0.0"
   },
